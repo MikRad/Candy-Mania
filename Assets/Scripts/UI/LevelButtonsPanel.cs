@@ -68,6 +68,8 @@ public class LevelButtonsPanel : UIView
     
     private void HandleBackButtonClick()
     {
+        _selectedLevelNumber = 0;
+        
         SetEnableElements(false);
         Hide();
         
