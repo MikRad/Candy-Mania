@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b365f6283c1a1384dbf7cdc27b1f0535, type: 3}
+  m_Name: DefaultSettings
+  m_EditorClassIdentifier: 
+  _gameFieldOffset: {x: 0.5, y: -0.5}
+  _cellSize: 1
+  _maxRowsNumber: 9
+  _maxColumnsNumber: 9
+  _minMatchNumber: 3
+  _defaultLevelName: level1
+  _levelsNumberTotal: 12

@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1af27e2eb59cbaf4e9fe05ab5d107bc8, type: 3}
+  m_Name: AudioSettings
+  m_EditorClassIdentifier: 
+  _sfxInfos:
+  - _name: ItemDetonation
+    _clip: {fileID: 8300000, guid: 28514a04ec3a604479e98fc2d694691b, type: 3}
+    _type: 0
+    _volume: 0.25
+    _pitch: 1.2
+  - _name: ButtonClick
+    _clip: {fileID: 8300000, guid: 11e06355f3424bd41ad5dec130611aeb, type: 3}
+    _type: 8
+    _volume: 1
+    _pitch: 1.2
+  - _name: TimeTick
+    _clip: {fileID: 8300000, guid: 87e50c262d3e85e47808858de176a47e, type: 3}
+    _type: 7
+    _volume: 1.2
+    _pitch: 1
+  - _name: UIPanelSlide
+    _clip: {fileID: 8300000, guid: ea9224c12e5e51740a515917f3dd7523, type: 3}
+    _type: 9
+    _volume: 0.4
+    _pitch: 2.5
+  - _name: ScoreCount
+    _clip: {fileID: 8300000, guid: 825be075fc9013346bf51d565bcabd5c, type: 3}
+    _type: 3
+    _volume: 1
+    _pitch: 1
+  - _name: BombDetonation
+    _clip: {fileID: 8300000, guid: 6d243f5cf1fb1fc4c905e504e672db0c, type: 3}
+    _type: 1
+    _volume: 0.4
+    _pitch: 1.75
+  - _name: StarDetonation
+    _clip: {fileID: 8300000, guid: d27d5ac6c4d2dcd418fe78532bc43489, type: 3}
+    _type: 2
+    _volume: 1.2
+    _pitch: 1.2
+  - _name: LevelCompleted
+    _clip: {fileID: 8300000, guid: 9f6d2b414d53e4d4faf6e9b9a7f937fd, type: 3}
+    _type: 5
+    _volume: 1.2
+    _pitch: 1.2
+  - _name: LevelFailed
+    _clip: {fileID: 8300000, guid: de6c65c709b5d524bb292bd83b22d8c4, type: 3}
+    _type: 6
+    _volume: 1.2
+    _pitch: 1
+  - _name: ScoreAdd
+    _clip: {fileID: 8300000, guid: 0d28baad10bd83e4189139820e8c07f7, type: 3}
+    _type: 4
+    _volume: 1.2
+    _pitch: 1.5
+  _musicTracks: []
