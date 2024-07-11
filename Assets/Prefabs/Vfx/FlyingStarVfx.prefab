@@ -98,10 +98,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _type: 8
-  _phase1PosDelta: {x: 0, y: 0, z: 0}
-  _phase2PosDelta: {x: 0, y: 0, z: 0}
-  _phase1Duration: 1
-  _phase2Duration: 2
-  _phase2EndAlpha: 0.25
-  _normalScale: {x: 1, y: 1, z: 1}
-  _maxScale: {x: 2, y: 2, z: 1}
+  _phase1PosDelta: {x: -0.5, y: -0.8, z: 0}
+  _phase2PosDelta: {x: 1, y: 5, z: 0}
+  _phase1Duration: 0.3
+  _phase2Duration: 1
+  _phase2EndAlpha: 0.2
+  _normalScale: {x: 0.4, y: 0.4, z: 1}
+  _maxScale: {x: 1, y: 1, z: 1}

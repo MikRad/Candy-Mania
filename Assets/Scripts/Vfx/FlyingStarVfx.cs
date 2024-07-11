@@ -31,8 +31,6 @@ public class FlyingStarVfx : VfxBase
 
     public override void Init(Vector3 position, Quaternion rotation)
     {
-        Debug.Log($"Flying star init !");
-        
         base.Init(position, rotation);
         
         _cachedTransform.localScale = _normalScale;
@@ -49,8 +47,6 @@ public class FlyingStarVfx : VfxBase
 
     private void HandleFlyingComplete()
     {
-        Debug.Log($"Flying complete !");
-        
         Remove();
         // VfxController.Instance.RemoveVfx(gameObject);
     }
