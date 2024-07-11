@@ -26,6 +26,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6112467733477305401}
   m_RootOrder: 1
@@ -57,6 +58,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6112467733477305401}
   m_RootOrder: 2
@@ -104,6 +106,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6112467734370080036}
   - {fileID: 6861609985733813049}
@@ -153,6 +156,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6112467734370080036}
   m_RootOrder: 0
@@ -183,6 +187,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6112467734370080036}
   m_RootOrder: 1
@@ -213,6 +218,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6112467734297748720}
   - {fileID: 6112467734362666593}
@@ -246,6 +252,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6112467733477305401}
   m_RootOrder: 3
@@ -297,6 +304,6 @@ MonoBehaviour:
   - {fileID: 7061109215948275296, guid: 7428e22f8e487664cbfb280103d0254b, type: 3}
   - {fileID: 7061109215948275296, guid: 945d790d75dfa574691d82dd17adb674, type: 3}
   - {fileID: 7061109215948275296, guid: 10087dcc9a8178e43bd67333d81a3679, type: 3}
-  _gameItemsContainer: {fileID: 6112467734370080036}
+  _gameItemsContainer: {fileID: 6112467734362666593}
   _usualGameItemPoolSize: 20
   _specialGameItemPoolSize: 5

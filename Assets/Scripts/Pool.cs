@@ -20,7 +20,7 @@ public class Pool<T> where T : MonoBehaviour
         InitPool(poolSize);
     }
 
-    public Pool(T prefab, int poolSize, Transform container, bool isAutoExpand)
+    public Pool(T prefab, int poolSize, Transform container, bool isAutoExpand = true)
     {
         Prefab = prefab;
         Container = container;

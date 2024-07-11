@@ -1,5 +1,4 @@
 using DG.Tweening;
-// using Lean.Pool;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -16,8 +15,6 @@ public class FlyingStarVfx : VfxBase
 
     private SpriteRenderer _spriteRenderer;
     private Color _startColor;
-
-    // private Transform _cachedTransform;
 
     protected override void Awake()
     {
@@ -48,7 +45,6 @@ public class FlyingStarVfx : VfxBase
     private void HandleFlyingComplete()
     {
         Remove();
-        // VfxController.Instance.RemoveVfx(gameObject);
     }
 }
 

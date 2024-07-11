@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6105772347855042949}
   - {fileID: 2988617222013786191}
@@ -58,7 +59,7 @@ PrefabInstance:
     - target: {fileID: 2018322621245669988, guid: 88cf4a9c6a5774f46bc00fa9c2b7a4d7, type: 3}
       propertyPath: _gameItemsContainer
       value: 
-      objectReference: {fileID: 6105772347222163608}
+      objectReference: {fileID: 6105772347095507933}
     - target: {fileID: 6112467733477305400, guid: 88cf4a9c6a5774f46bc00fa9c2b7a4d7, type: 3}
       propertyPath: m_Name
       value: LevelController
@@ -109,14 +110,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88cf4a9c6a5774f46bc00fa9c2b7a4d7, type: 3}
+--- !u!4 &6105772347095507933 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6112467734362666593, guid: 88cf4a9c6a5774f46bc00fa9c2b7a4d7, type: 3}
+  m_PrefabInstance: {fileID: 31479694154978748}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6105772347855042949 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6112467733477305401, guid: 88cf4a9c6a5774f46bc00fa9c2b7a4d7, type: 3}
-  m_PrefabInstance: {fileID: 31479694154978748}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &6105772347222163608 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6112467734370080036, guid: 88cf4a9c6a5774f46bc00fa9c2b7a4d7, type: 3}
   m_PrefabInstance: {fileID: 31479694154978748}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5576815346241297812
