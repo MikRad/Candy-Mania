@@ -71,11 +71,11 @@ public class MainMenu : MonoBehaviour
 
     private void HandleExitButtonClick(object param)
     {
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
-
-        _uiViewsController.HideUIView(UIViewType.MainMenuElements);
-        
-        ScreenFader.Instance.FadeOut().OnCompleted(ExitApplication);
+        // AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+        //
+        // _uiViewsController.HideUIView(UIViewType.MainMenuElements);
+        //
+        // ScreenFader.Instance.FadeOut().OnCompleted(ExitApplication);
     }
 
     private void HandleSettingsPanelContinueClick(object param)
@@ -102,12 +102,12 @@ public class MainMenu : MonoBehaviour
 
     private void ExitApplication()
     {
-
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-
+//
+// #if UNITY_EDITOR
+//         UnityEditor.EditorApplication.isPlaying = false;
+// #else
+//         Application.Quit();
+// #endif
+//
     }
 }

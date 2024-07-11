@@ -11,8 +11,8 @@ public class GamefieldShakerVfx : MonoBehaviour
 
     public void Shake()
     {
-        DOTween.Sequence()
-            .Append(_gameFieldTransform.DOMoveY(_gameFieldTransform.position.y - _gameFieldShakeDelta, _gameFieldShakeDuration)).SetEase(_gameFieldShakeEase)
-            .Append(_gameFieldTransform.DOMoveY(_gameFieldTransform.position.y, _gameFieldShakeDuration)).SetEase(_gameFieldShakeEase);
+        // DOTween.Sequence()
+        //     .Append(_gameFieldTransform.DOMoveY(_gameFieldTransform.position.y - _gameFieldShakeDelta, _gameFieldShakeDuration)).SetEase(_gameFieldShakeEase)
+        //     .Append(_gameFieldTransform.DOMoveY(_gameFieldTransform.position.y, _gameFieldShakeDuration)).SetEase(_gameFieldShakeEase);
     }
 }
