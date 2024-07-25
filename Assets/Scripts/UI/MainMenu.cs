@@ -12,7 +12,7 @@ public class MainMenu : MonoBehaviour
     private void Start()
     {
         Init();
-        AddUIViewsEventsHandlers();
+        AddUIEventsHandlers();
 
         ScreenFader.Instance.FadeIn().OnCompleted(() =>
         {
@@ -22,7 +22,7 @@ public class MainMenu : MonoBehaviour
 
     private void OnDestroy()
     {
-        RemoveUIViewsEventsHandlers();
+        RemoveUIEventsHandlers();
     }
 
     private void Init()
@@ -33,27 +33,27 @@ public class MainMenu : MonoBehaviour
         _uiViewsController.SetLevelButtonsInitData(_progressController.MaxReachedLevelNumber, _progressController.LevelsNumberTotal);
     }
 
-    private void AddUIViewsEventsHandlers()
+    private void AddUIEventsHandlers()
     {
-        _uiViewsController.AddUIEventSubscriber(UIEventType.SettingsContinueClick, HandleSettingsPanelContinueClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.LevelButtonsBackClick, HandleLevelButtonsPanelBackClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.LevelButtonsLevelSelected, HandleLevelButtonClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.MainMenuElementsPlayClick, HandlePlayButtonClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.MainMenuElementsSettingsClick, HandleSettingsButtonClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.MainMenuElementsExitClick, HandleExitButtonClick);
+        EventBus.Get.Subscribe<UIEvents.MainMenuPlayClicked>(HandlePlayButtonClicked);
+        EventBus.Get.Subscribe<UIEvents.MainMenuSettingsClicked>(HandleSettingsButtonClicked);
+        EventBus.Get.Subscribe<UIEvents.MainMenuExitClicked>(HandleExitButtonClicked);
+        EventBus.Get.Subscribe<UIEvents.LevelButtonsPanelBackClicked>(HandleLevelButtonsPanelBackClicked);
+        EventBus.Get.Subscribe<UIEvents.LevelButtonsPanelLevelSelected>(HandleLevelSelected);
+        EventBus.Get.Subscribe<UIEvents.SettingsPanelContinueClicked>(HandleSettingsPanelContinueClicked);
     }
     
-    private void RemoveUIViewsEventsHandlers()
+    private void RemoveUIEventsHandlers()
     {
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.SettingsContinueClick, HandleSettingsPanelContinueClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.LevelButtonsBackClick, HandleLevelButtonsPanelBackClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.LevelButtonsLevelSelected, HandleLevelButtonClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.MainMenuElementsPlayClick, HandlePlayButtonClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.MainMenuElementsSettingsClick, HandleSettingsButtonClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.MainMenuElementsExitClick, HandleExitButtonClick);
+        EventBus.Get.Unsubscribe<UIEvents.MainMenuPlayClicked>(HandlePlayButtonClicked);
+        EventBus.Get.Unsubscribe<UIEvents.MainMenuSettingsClicked>(HandleSettingsButtonClicked);
+        EventBus.Get.Unsubscribe<UIEvents.MainMenuExitClicked>(HandleExitButtonClicked);
+        EventBus.Get.Unsubscribe<UIEvents.LevelButtonsPanelBackClicked>(HandleLevelButtonsPanelBackClicked);
+        EventBus.Get.Unsubscribe<UIEvents.LevelButtonsPanelLevelSelected>(HandleLevelSelected);
+        EventBus.Get.Unsubscribe<UIEvents.SettingsPanelContinueClicked>(HandleSettingsPanelContinueClicked);
     }
     
-    private void HandlePlayButtonClick(object param)
+    private void HandlePlayButtonClicked()
     {
         AudioController.Instance.PlaySfx(SfxType.ButtonClick);
 
@@ -61,7 +61,7 @@ public class MainMenu : MonoBehaviour
         _uiViewsController.ShowUIView(UIViewType.LevelButtonsPanel);
     }
 
-    private void HandleSettingsButtonClick(object param)
+    private void HandleSettingsButtonClicked()
     {
         AudioController.Instance.PlaySfx(SfxType.ButtonClick);
 
@@ -69,28 +69,28 @@ public class MainMenu : MonoBehaviour
         _uiViewsController.ShowUIView(UIViewType.SettingsPanelMainMenu);
     }
 
-    private void HandleExitButtonClick(object param)
+    private void HandleExitButtonClicked()
     {
-        // AudioController.Instance.PlaySfx(SfxType.ButtonClick);
-        //
-        // _uiViewsController.HideUIView(UIViewType.MainMenuElements);
-        //
-        // ScreenFader.Instance.FadeOut().OnCompleted(ExitApplication);
+        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+        
+        _uiViewsController.HideUIView(UIViewType.MainMenuElements);
+        
+        ScreenFader.Instance.FadeOut().OnCompleted(ExitApplication);
     }
 
-    private void HandleSettingsPanelContinueClick(object param)
+    private void HandleSettingsPanelContinueClicked()
     {
         _uiViewsController.ShowUIView(UIViewType.MainMenuElements);
     }
 
-    private void HandleLevelButtonsPanelBackClick(object param)
+    private void HandleLevelButtonsPanelBackClicked()
     { 
         _uiViewsController.ShowUIView(UIViewType.MainMenuElements);
     }
     
-    private void HandleLevelButtonClick(object param)
+    private void HandleLevelSelected(UIEvents.LevelButtonsPanelLevelSelected ev)
     {
-        _progressController.SetStartLevel((int)param);
+        _progressController.SetStartLevel(ev.LevelNumber);
         
         ScreenFader.Instance.FadeOut().OnCompleted(StartGame);
     }
@@ -102,12 +102,12 @@ public class MainMenu : MonoBehaviour
 
     private void ExitApplication()
     {
-//
-// #if UNITY_EDITOR
-//         UnityEditor.EditorApplication.isPlaying = false;
-// #else
-//         Application.Quit();
-// #endif
-//
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+
     }
 }

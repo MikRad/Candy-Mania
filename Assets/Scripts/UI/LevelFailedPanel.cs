@@ -70,6 +70,6 @@ public class LevelFailedPanel : UIView
     {
         base.HandleHideCompleted();
 
-        InvokeOnUserEvent(UIEventType.LevelFailedRestartClick, null);
+        EventBus.Get.RaiseEvent(this, new UIEvents.LevelFailedPanelRestartClicked());
     }
 }

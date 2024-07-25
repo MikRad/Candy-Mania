@@ -73,7 +73,7 @@ public class LevelButtonsPanel : UIView
         SetEnableElements(false);
         Hide();
         
-        InvokeOnUserEvent(UIEventType.LevelButtonsBackClick, null);
+        EventBus.Get.RaiseEvent(this, new UIEvents.LevelButtonsPanelBackClicked());
     }
 
     protected override void HandleHideCompleted()
@@ -82,7 +82,7 @@ public class LevelButtonsPanel : UIView
 
         if (_selectedLevelNumber > 0)
         {
-            InvokeOnUserEvent(UIEventType.LevelButtonsLevelSelected, _selectedLevelNumber);
+            EventBus.Get.RaiseEvent(this, new UIEvents.LevelButtonsPanelLevelSelected(_selectedLevelNumber));
         }
     }
 }

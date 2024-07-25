@@ -46,7 +46,7 @@ public class LevelEditor : MonoBehaviour
     private Cell[,] _cells;
     private GameObject _selectedTemplate;
 
-    private CameraWrapper _cameraWrapper;
+    private CameraHolder _cameraHolder;
     
     private Vector2 GameFieldOffset => _settings._gameFieldOffset;
     private float CellSize => _settings._cellSize;
@@ -70,7 +70,7 @@ public class LevelEditor : MonoBehaviour
 
     private void Start()
     {
-        _cameraWrapper = CameraWrapper.Instance;
+        _cameraHolder = CameraHolder.Instance;
         
         InitBack();
 
@@ -214,7 +214,7 @@ public class LevelEditor : MonoBehaviour
 
     private void TrySelectNewTemplate()
     {
-        Ray ray = _cameraWrapper.ScreenPointToRay(Input.mousePosition);
+        Ray ray = _cameraHolder.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
         if (hit.collider != null)
@@ -448,7 +448,7 @@ public class LevelEditor : MonoBehaviour
     private Vector2 GetMouseWorldPosition()
     {
         Vector2 mousePixelsPos = Input.mousePosition;
-        return _cameraWrapper.ScreenToWorldPoint(mousePixelsPos);
+        return _cameraHolder.ScreenToWorldPoint(mousePixelsPos);
     }
 
     private void InitBack()

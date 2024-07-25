@@ -48,7 +48,7 @@ public class LevelController : MonoBehaviour
     private VictoryConditionsUpdater _victoryConditionsUpdater;
     private UIViewsController _uiViewsController;
     private GameProgressController _gameProgressController;
-    private CameraWrapper _cameraWrapper;
+    private CameraHolder _cameraHolder;
     private GamefieldShakerVfx _gamefieldShaker;
 
     public int MaxComboCount { get; private set; } = 1;
@@ -81,7 +81,7 @@ public class LevelController : MonoBehaviour
         _gameItemSpawner = GetComponentInChildren<GameItemSpawner>();
         _gamefieldShaker = GetComponentInChildren<GamefieldShakerVfx>();
 
-        _cameraWrapper = CameraWrapper.Instance;
+        _cameraHolder = CameraHolder.Instance;
         _uiViewsController = UIViewsController.Instance;
         _victoryConditionsUpdater = new VictoryConditionsUpdater();
         _cellsProcessor = new CellsProcessor(_maxRowsNumber, _maxColumnsNumber, _minMatchNumber);
@@ -568,6 +568,6 @@ public class LevelController : MonoBehaviour
     private Vector2 GetMouseWorldPosition()
     {
         Vector2 mousePixelsPos = Input.mousePosition;
-        return _cameraWrapper.ScreenToWorldPoint(mousePixelsPos);
+        return _cameraHolder.ScreenToWorldPoint(mousePixelsPos);
     }
 }

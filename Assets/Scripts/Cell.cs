@@ -1,5 +1,4 @@
 using DG.Tweening;
-// using Lean.Pool;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -62,7 +61,6 @@ public class Cell : MonoBehaviour
             return;
         
         GameItem.Remove();
-        // LeanPool.Despawn(GameItem.gameObject);
         GameItem = null;
     }
 

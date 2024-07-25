@@ -12,21 +12,23 @@ public class GameItemSpawner : MonoBehaviour
     [SerializeField] private GameItem[] _horBombGameItemPrefabs;
     [SerializeField] private GameItem[] _starGameItemPrefabs;
 
-    [Header("Containers & game items pooling")]
+    [Header("Containers")]
     [SerializeField] private Transform _gameItemsContainer;
-    [SerializeField] private int _usualGameItemPoolSize = 20;
-    [SerializeField] private int _specialGameItemPoolSize = 10;
 
-    private readonly Dictionary<GameItemType, Pool<GameItem>> _gameItemPoolsMap = new Dictionary<GameItemType, Pool<GameItem>>();
+    private readonly Dictionary<GameItemType, Pool<GameItem>> _gameItemPoolsMap = new Dictionary<GameItemType, Pool<GameItem>>(GameItemPoolsMapSize);
     private CellsProcessor _cellsProcessor;
     
     private int _specialItemGenerationProbability;
-    private int _bombGenerationProbability;
-    private int _vertBombGenerationProbability;
-    private int _horBombGenerationProbability;
-    private int _starGenerationProbability;
-    private int _cumulativeSpecialItemGenerationProbability;
-    // private List<GameItem> _specialGameItemsPrefabs;
+    private int _bombProbabilityWeight;
+    private int _vertBombProbabilityWeight;
+    private int _horBombProbabilityWeight;
+    private int _starProbabilityWeight;
+    private int _totalSpecialItemProbabilityWeight;
+
+    private const int GameItemPoolsMapSize = 50; 
+    private const int UsualGameItemPoolSize = 20;
+    private const int SpecialGameItemPoolSize = 10;
+    
     private List<SpecialItemGenerationData> _specialItemsGenerationDatas;
 
     public event Action<GameItem> OnItemSpawned; 
@@ -41,15 +43,14 @@ public class GameItemSpawner : MonoBehaviour
     public void InitProbabilities(LevelData levelData)
     {
         _specialItemGenerationProbability = levelData._specialItemGenerationProbability;
-        _bombGenerationProbability = levelData._bombItemGenerationProbability;
-        _vertBombGenerationProbability = levelData._vertBombItemGenerationProbability;
-        _horBombGenerationProbability = levelData._horBombItemGenerationProbability;
-        _starGenerationProbability = levelData._starItemGenerationProbability;
-        _cumulativeSpecialItemGenerationProbability = _bombGenerationProbability + _vertBombGenerationProbability +
-                                                      _horBombGenerationProbability + _starGenerationProbability;
+        _bombProbabilityWeight = levelData._bombItemGenerationProbability;
+        _vertBombProbabilityWeight = levelData._vertBombItemGenerationProbability;
+        _horBombProbabilityWeight = levelData._horBombItemGenerationProbability;
+        _starProbabilityWeight = levelData._starItemGenerationProbability;
+        _totalSpecialItemProbabilityWeight = _bombProbabilityWeight + _vertBombProbabilityWeight +
+                                                      _horBombProbabilityWeight + _starProbabilityWeight;
 
         FillSpecialItemsGenerationData();
-        // FillSpecialItemsPrefabs();
     }
 
     public void CreateItemForCell(Cell cell, GameItemType gItemType, bool isIgnoreMatches = false)
@@ -90,10 +91,10 @@ public class GameItemSpawner : MonoBehaviour
             return _usualGameItemPrefabs[randIdx];
         }
 
-        int randProbability = Random.Range(0, _cumulativeSpecialItemGenerationProbability + 1);
+        int randProbability = Random.Range(0, _totalSpecialItemProbabilityWeight + 1);
         for (int i = 0; i < _specialItemsGenerationDatas.Count; i++)
         {
-            if (_specialItemsGenerationDatas[i].cumulativeProbability >= randProbability )
+            if (_specialItemsGenerationDatas[i].cumulativeProbabilityWeight >= randProbability )
             {
                 GameItem[] prefabs = _specialItemsGenerationDatas[i].prefabs;
                 int randIdx = Random.Range(0, prefabs.Length);
@@ -103,10 +104,6 @@ public class GameItemSpawner : MonoBehaviour
         }
 
         return null;
-        // int randIdx = (isUsual) ? Random.Range(0, _usualGameItemPrefabs.Length) : 
-        //     Random.Range(0, _specialGameItemsPrefabs.Count);
-        //
-        // return (isUsual) ? _usualGameItemPrefabs[randIdx] : _specialGameItemsPrefabs[randIdx];
     }
 
     private void GenerateRandomUsualGameItem(Cell cell, bool isInitFall = false, Vector2 fallStartPosition = default)
@@ -164,62 +161,37 @@ public class GameItemSpawner : MonoBehaviour
     {
         for (int i = 0; i < (int)GameItemType.Item6; i++)
         {
-            _gameItemPoolsMap.Add(_usualGameItemPrefabs[i].ItemType, new Pool<GameItem>(_usualGameItemPrefabs[i], _usualGameItemPoolSize, _gameItemsContainer));
-            _gameItemPoolsMap.Add(_bombGameItemPrefabs[i].ItemType, new Pool<GameItem>(_bombGameItemPrefabs[i], _specialGameItemPoolSize, _gameItemsContainer));
-            _gameItemPoolsMap.Add(_vertBombGameItemPrefabs[i].ItemType, new Pool<GameItem>(_vertBombGameItemPrefabs[i], _specialGameItemPoolSize, _gameItemsContainer));
-            _gameItemPoolsMap.Add(_horBombGameItemPrefabs[i].ItemType, new Pool<GameItem>(_horBombGameItemPrefabs[i], _specialGameItemPoolSize, _gameItemsContainer));
-            _gameItemPoolsMap.Add(_starGameItemPrefabs[i].ItemType, new Pool<GameItem>(_starGameItemPrefabs[i], _specialGameItemPoolSize, _gameItemsContainer));
+            _gameItemPoolsMap.Add(_usualGameItemPrefabs[i].ItemType, new Pool<GameItem>(_usualGameItemPrefabs[i], UsualGameItemPoolSize, _gameItemsContainer));
+            _gameItemPoolsMap.Add(_bombGameItemPrefabs[i].ItemType, new Pool<GameItem>(_bombGameItemPrefabs[i], SpecialGameItemPoolSize, _gameItemsContainer));
+            _gameItemPoolsMap.Add(_vertBombGameItemPrefabs[i].ItemType, new Pool<GameItem>(_vertBombGameItemPrefabs[i], SpecialGameItemPoolSize, _gameItemsContainer));
+            _gameItemPoolsMap.Add(_horBombGameItemPrefabs[i].ItemType, new Pool<GameItem>(_horBombGameItemPrefabs[i], SpecialGameItemPoolSize, _gameItemsContainer));
+            _gameItemPoolsMap.Add(_starGameItemPrefabs[i].ItemType, new Pool<GameItem>(_starGameItemPrefabs[i], SpecialGameItemPoolSize, _gameItemsContainer));
         }
     }
-    
-    // private void FillSpecialItemsPrefabs()
-    // {
-    //     _specialGameItemsPrefabs = new List<GameItem>();
-    //     for (int i = 0; i < _bombItemGenerationProbability; i++)
-    //     {
-    //         int randIdx = Random.Range(0, _bombGameItemPrefabs.Length);
-    //         _specialGameItemsPrefabs.Add(_bombGameItemPrefabs[randIdx]);
-    //     }
-    //     for (int i = 0; i < _vertBombItemGenerationProbability; i++)
-    //     {
-    //         int randIdx = Random.Range(0, _vertBombGameItemPrefabs.Length);
-    //         _specialGameItemsPrefabs.Add(_vertBombGameItemPrefabs[randIdx]);
-    //     }
-    //     for (int i = 0; i < _horBombItemGenerationProbability; i++)
-    //     {
-    //         int randIdx = Random.Range(0, _horBombGameItemPrefabs.Length);
-    //         _specialGameItemsPrefabs.Add(_horBombGameItemPrefabs[randIdx]);
-    //     }
-    //     for (int i = 0; i < _starItemGenerationProbability; i++)
-    //     {
-    //         int randIdx = Random.Range(0, _starGameItemPrefabs.Length);
-    //         _specialGameItemsPrefabs.Add(_starGameItemPrefabs[randIdx]);
-    //     }
-    // }
     
     private void FillSpecialItemsGenerationData()
     {
         _specialItemsGenerationDatas = new List<SpecialItemGenerationData>();
         
         _specialItemsGenerationDatas.Add(
-            new SpecialItemGenerationData(_bombGenerationProbability, _bombGameItemPrefabs));
+            new SpecialItemGenerationData(_bombProbabilityWeight, _bombGameItemPrefabs));
         _specialItemsGenerationDatas.Add(
-            new SpecialItemGenerationData(_bombGenerationProbability + _vertBombGenerationProbability, _vertBombGameItemPrefabs));
+            new SpecialItemGenerationData(_bombProbabilityWeight + _vertBombProbabilityWeight, _vertBombGameItemPrefabs));
         _specialItemsGenerationDatas.Add(
-            new SpecialItemGenerationData(_bombGenerationProbability + _vertBombGenerationProbability + _horBombGenerationProbability, _horBombGameItemPrefabs)); 
+            new SpecialItemGenerationData(_bombProbabilityWeight + _vertBombProbabilityWeight + _horBombProbabilityWeight, _horBombGameItemPrefabs)); 
         _specialItemsGenerationDatas.Add(
-            new SpecialItemGenerationData(_bombGenerationProbability + _vertBombGenerationProbability + _horBombGenerationProbability + _starGenerationProbability, _starGameItemPrefabs));
+            new SpecialItemGenerationData(_bombProbabilityWeight + _vertBombProbabilityWeight + _horBombProbabilityWeight + _starProbabilityWeight, _starGameItemPrefabs));
     }
     
     private struct SpecialItemGenerationData
     {
-        public int cumulativeProbability;
-        public GameItem[] prefabs;
+        public readonly int cumulativeProbabilityWeight;
+        public readonly GameItem[] prefabs;
 
-        public SpecialItemGenerationData(int cumulativeProbability, GameItem[] prefabs)
+        public SpecialItemGenerationData(int cumProbabilityWeight, GameItem[] siPrefabs)
         {
-            this.cumulativeProbability = cumulativeProbability;
-            this.prefabs = prefabs;
+            cumulativeProbabilityWeight = cumProbabilityWeight;
+            prefabs = siPrefabs;
         }
     }
 }

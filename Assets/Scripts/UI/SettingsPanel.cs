@@ -9,8 +9,8 @@ public class SettingsPanel : UIView
     [SerializeField] private Button _continueButton;
     [SerializeField] private Button _mainMenuButton;
 
-    private UIEventType _userEventType = UIEventType.Undefined;
-
+    private PanelClosedResult _panelClosedResult;
+    
     protected override void Start()
     {
         base.Start();
@@ -41,8 +41,8 @@ public class SettingsPanel : UIView
         AudioController.Instance.PlaySfx(SfxType.ButtonClick);
 
         Hide();
-        
-        _userEventType = UIEventType.SettingsContinueClick;
+
+        _panelClosedResult = PanelClosedResult.ContinueGame;
     }
 
     private void MainMenuClickHandler()
@@ -51,7 +51,7 @@ public class SettingsPanel : UIView
 
         Hide();
         
-        _userEventType = UIEventType.SettingsMainMenuClick;
+        _panelClosedResult = PanelClosedResult.ToMainMenu;
     }
 
     private void InitSlidersValues()
@@ -86,9 +86,24 @@ public class SettingsPanel : UIView
     protected override void HandleHideCompleted()
     {
         base.HandleHideCompleted();
-        
-        InvokeOnUserEvent(_userEventType, null);
 
-        _userEventType = UIEventType.Undefined;
+        switch (_panelClosedResult)
+        {
+            case PanelClosedResult.ContinueGame:
+                EventBus.Get.RaiseEvent(this, new UIEvents.SettingsPanelContinueClicked());
+                break;
+            case PanelClosedResult.ToMainMenu:
+                EventBus.Get.RaiseEvent(this, new UIEvents.SettingsPanelToMainMenuClicked());
+                break;
+        }
+
+        _panelClosedResult = PanelClosedResult.Undefined;
+    }
+
+    private enum PanelClosedResult
+    {
+        Undefined,
+        ContinueGame,
+        ToMainMenu,
     }
 }

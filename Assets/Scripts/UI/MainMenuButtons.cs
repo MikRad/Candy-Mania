@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class MainMenuUIElements : UIView
+public class MainMenuButtons : UIView
 {
-    [Header("UI elements")]
+    [Header("Buttons")]
     [SerializeField] private Button _playButton;
     [SerializeField] private Button _settingsButton;
     [SerializeField] private Button _exitButton;
@@ -45,16 +45,16 @@ public class MainMenuUIElements : UIView
     
     private void HandlePlayButtonClick()
     {
-        InvokeOnUserEvent(UIEventType.MainMenuElementsPlayClick, null);
+        EventBus.Get.RaiseEvent(this, new UIEvents.MainMenuPlayClicked());
     }
 
     private void HandleSettingsButtonClick()
     {
-        InvokeOnUserEvent(UIEventType.MainMenuElementsSettingsClick, null);
+        EventBus.Get.RaiseEvent(this, new UIEvents.MainMenuSettingsClicked());
     }
 
     private void HandleExitButtonClick()
     {
-        InvokeOnUserEvent(UIEventType.MainMenuElementsExitClick, null);
+        EventBus.Get.RaiseEvent(this, new UIEvents.MainMenuExitClicked());
     }
 }

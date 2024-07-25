@@ -55,8 +55,6 @@ public class FlyingMessage : VfxBase
                 _messageText.color = _warningColor;
                 break;
         }
-
-        // _cachedTransform.position = pos;
     }
     
     private void UpdateLifeTime()
@@ -66,7 +64,6 @@ public class FlyingMessage : VfxBase
         if(_timeToDisappear <= 0) 
         {
             Remove();
-            // VfxController.Instance.RemoveVfx(gameObject);
         }
     }
     

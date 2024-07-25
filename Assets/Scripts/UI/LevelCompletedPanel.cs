@@ -76,7 +76,7 @@ public class LevelCompletedPanel : UIView
     protected override void HandleHideCompleted()
     {
         base.HandleHideCompleted();
-        
-        InvokeOnUserEvent(UIEventType.LevelCompletedContinueClick, null);
+     
+        EventBus.Get.RaiseEvent(this, new UIEvents.LevelCompletedPanelContinueClicked());
     }
 }

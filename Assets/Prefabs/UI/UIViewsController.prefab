@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 547461507053005818}
   m_Father: {fileID: 0}
@@ -45,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _canvasTransform: {fileID: 547461507053005818}
-  _mainMenuElementsPrefab: {fileID: 3418926548681293084, guid: ea39d293c0aa1a64292e88bad7c8ca0a, type: 3}
+  _mainMenuButtonsPrefab: {fileID: 3418926548681293084, guid: ea39d293c0aa1a64292e88bad7c8ca0a, type: 3}
   _levelButtonsPanelPrefab: {fileID: 2817956409170444527, guid: e6b84fad0e0f93447aee1d60a171cd79, type: 3}
   _settingsPanelPrefab: {fileID: 1420344288814865342, guid: 9b3d1052efdaa7d46b70bb6c96ddbea4, type: 3}
   _settingsPanelMainMenuPrefab: {fileID: 1420344288814865342, guid: ccee514272c40a849b137c04938886aa, type: 3}
@@ -81,6 +82,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1931541498415239156}
   m_RootOrder: 0

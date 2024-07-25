@@ -62,11 +62,11 @@ public class Game : MonoBehaviour
 
     private void AddServicesEventHandlers()
     {
-        _uiViewsController.AddUIEventSubscriber(UIEventType.LevelCompletedContinueClick, HandleLevelCompletedPanelContinueClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.LevelFailedRestartClick, HandleLevelFailedPanelRestartClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.SettingsContinueClick, HandleSettingsPanelContinueClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.SettingsMainMenuClick, HandleSettingsPanelMainMenuClick);
-        _uiViewsController.AddUIEventSubscriber(UIEventType.LevelInfoSettingsClick, HandleSettingsButtonClick);
+        EventBus.Get.Subscribe<UIEvents.LevelCompletedPanelContinueClicked>(HandleLevelCompletedPanelContinue);
+        EventBus.Get.Subscribe<UIEvents.LevelFailedPanelRestartClicked>(HandleLevelFailedPanelRestart);
+        EventBus.Get.Subscribe<UIEvents.SettingsPanelContinueClicked>(HandleSettingsPanelContinue);
+        EventBus.Get.Subscribe<UIEvents.SettingsPanelToMainMenuClicked>(HandleSettingsPanelToMainMenu);
+        EventBus.Get.Subscribe<UIEvents.LevelInfoPanelSettingsClicked>(HandleLevelInfoPanelSettingsClicked);
         
         _levelController.OnLevelCompleted += HandleLevelCompleted;
         _levelController.OnLevelFailed += HandleLevelFailed;
@@ -75,18 +75,18 @@ public class Game : MonoBehaviour
 
     private void RemoveServicesEventHandlers()
     {
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.LevelCompletedContinueClick, HandleLevelCompletedPanelContinueClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.LevelFailedRestartClick, HandleLevelFailedPanelRestartClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.LevelInfoSettingsClick, HandleSettingsButtonClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.SettingsContinueClick, HandleSettingsPanelContinueClick);
-        _uiViewsController.RemoveUIEventSubscriber(UIEventType.SettingsMainMenuClick, HandleSettingsPanelMainMenuClick);
+        EventBus.Get.Unsubscribe<UIEvents.LevelCompletedPanelContinueClicked>(HandleLevelCompletedPanelContinue);
+        EventBus.Get.Unsubscribe<UIEvents.LevelFailedPanelRestartClicked>(HandleLevelFailedPanelRestart);
+        EventBus.Get.Unsubscribe<UIEvents.SettingsPanelContinueClicked>(HandleSettingsPanelContinue);
+        EventBus.Get.Unsubscribe<UIEvents.SettingsPanelToMainMenuClicked>(HandleSettingsPanelToMainMenu);
+        EventBus.Get.Unsubscribe<UIEvents.LevelInfoPanelSettingsClicked>(HandleLevelInfoPanelSettingsClicked);
         
         _levelController.OnLevelCompleted -= HandleLevelCompleted;
         _levelController.OnLevelFailed -= HandleLevelFailed;
         _progressController.OnAllLevelsCompleted -= HandleAllLevelsCompleted;
     }
 
-    private void HandleSettingsButtonClick(object param)
+    private void HandleLevelInfoPanelSettingsClicked()
     {
         SetPaused(true);
 
@@ -139,28 +139,28 @@ public class Game : MonoBehaviour
         Time.timeScale = isPaused ? 0f : 1f;
     }
 
-    private void HandleLevelCompletedPanelContinueClick(object param)
+    private void HandleLevelCompletedPanelContinue()
     {
         _progressController.HandleLevelCompleted();
         
         ScreenFader.Instance.FadeOut().OnCompleted(StartLevel);
     }
 
-    private void HandleLevelFailedPanelRestartClick(object param)
+    private void HandleLevelFailedPanelRestart()
     {
         _progressController.HandleLevelFailed();
         
         ScreenFader.Instance.FadeOut().OnCompleted(StartLevel);
     }
 
-    private void HandleSettingsPanelContinueClick(object param)
+    private void HandleSettingsPanelContinue()
     {
         SetPaused(false);
         
         _uiViewsController.ShowUIView(UIViewType.LevelInfoPanel);        
     }
 
-    private void HandleSettingsPanelMainMenuClick(object param)
+    private void HandleSettingsPanelToMainMenu()
     {
         SetPaused(false);
         

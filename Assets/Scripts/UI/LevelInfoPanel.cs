@@ -123,6 +123,6 @@ public class LevelInfoPanel : UIView
 
         AudioController.Instance.PlaySfx(SfxType.ButtonClick);
 
-        InvokeOnUserEvent(UIEventType.LevelInfoSettingsClick, null);
+        EventBus.Get.RaiseEvent(this, new UIEvents.LevelInfoPanelSettingsClicked());
     }
 }

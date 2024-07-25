@@ -74,7 +74,6 @@ public class ScalerVfx : VfxBase
         _onCompletedCallback?.Invoke();
         _onCompletedCallback = null;
 
-        // VfxController.Instance.RemoveVfx(gameObject);
         Remove();
     }
 

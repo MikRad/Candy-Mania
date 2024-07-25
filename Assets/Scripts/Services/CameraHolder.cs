@@ -1,9 +1,10 @@
 using UnityEngine;
 
-public class CameraWrapper : MonoBehaviour
+public class CameraHolder : MonoBehaviour
 {
-    public static CameraWrapper Instance { get; private set; }
-    private Camera MainCamera { get; set; }
+    private Camera _mainCamera;
+    
+    public static CameraHolder Instance { get; private set; }
 
     private void Awake()
     {
@@ -28,27 +29,27 @@ public class CameraWrapper : MonoBehaviour
 
     public Vector3 ScreenToWorldPoint(Vector3 screenPosition)
     {
-        return MainCamera.ScreenToWorldPoint(screenPosition);
+        return _mainCamera.ScreenToWorldPoint(screenPosition);
     }
     
     public Ray ScreenPointToRay(Vector3 screenPosition)
     {
-        return MainCamera.ScreenPointToRay(screenPosition);
+        return _mainCamera.ScreenPointToRay(screenPosition);
     }
     
     private void InitView()
     {
-        MainCamera = Camera.main;
+        _mainCamera = Camera.main;
         
-        if (MainCamera == null)
+        if (_mainCamera == null)
         {
-            Debug.LogError($"{nameof(CameraWrapper)}:{nameof(InitView)} - main camera is null !");
+            Debug.LogError($"{nameof(CameraHolder)}:{nameof(InitView)} - main camera is null !");
             return;
         }
 
-        Transform mainCameraTransform = MainCamera.transform;
+        Transform mainCameraTransform = _mainCamera.transform;
 
-        Vector2 screenSizeWorld = MainCamera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+        Vector2 screenSizeWorld = _mainCamera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
         
         Vector3 cameraPos = mainCameraTransform.position;
         cameraPos.x = screenSizeWorld.x;
