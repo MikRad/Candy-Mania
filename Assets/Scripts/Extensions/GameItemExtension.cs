@@ -51,12 +51,12 @@ public static class GameItemExtension
         return (type > GameItemType.ItemStarOffset);
     }
 
-    public static VictoryCondition.Type GetVictoryType(this GameItem gItem)
+    public static LevelPassCondition.Type GetPassConditionType(this GameItem gItem)
     {
         if (gItem.IsStar())
-            return VictoryCondition.Type.ItemStarCollect;
+            return LevelPassCondition.Type.ItemStarCollect;
 
-        return (VictoryCondition.Type)gItem.BaseItemType;
+        return (LevelPassCondition.Type)gItem.BaseItemType;
     }
 
     public static bool IsUsualBomb(this GameItem gItem)

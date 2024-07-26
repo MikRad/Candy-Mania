@@ -12,7 +12,7 @@
     FlyingMessage = 9,
     FlyingScore = 10,
     Scaler = 11,
-    ScalerVCView = 12,
+    ScalerLPCView = 12,
     ItemSelection = 13,
     FallenItem = 14,
 }

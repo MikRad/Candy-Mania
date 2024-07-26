@@ -418,12 +418,12 @@ MonoBehaviour:
       _j: 8
     _detonationsToClear: -1
     _gameItemType: 0
-  _victoryConditions:
-  - _victoryConditionType: 0
+  _levelPassConditions:
+  - _levelPassConditionType: 0
     _numberNeededToComplete: 80
-  - _victoryConditionType: 1
+  - _levelPassConditionType: 6
     _numberNeededToComplete: 30
-  - _victoryConditionType: 6
+  - _levelPassConditionType: 4
     _numberNeededToComplete: 20
   _specialItemGenerationProbability: 3
   _bombItemGenerationProbability: 20

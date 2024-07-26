@@ -16,7 +16,7 @@ public class LevelEditor : MonoBehaviour
     [SerializeField] private int _horBombItemGenerationProbability = 20;
     [SerializeField] private int _starItemGenerationProbability = 40;
     [SerializeField] private float _timeLimit = 180f;
-    [SerializeField] private List<VictoryCondition> _victoryConditions;
+    [SerializeField] private List<LevelPassCondition> _victoryConditions;
 
     [Header("View settings")]
     [SerializeField] private GameObject _gameFieldBack;
@@ -164,7 +164,7 @@ public class LevelEditor : MonoBehaviour
         }
 
         _victoryConditions[0]._numberNeededToComplete = overallDetonationsToClear;
-        _levelData._victoryConditions = _victoryConditions;
+        _levelData._levelPassConditions = _victoryConditions;
 
         _levelData._specialItemGenerationProbability = _specialItemGenerationProbability;
         _levelData._bombItemGenerationProbability = _bombItemGenerationProbability;
@@ -358,9 +358,10 @@ public class LevelEditor : MonoBehaviour
         {
             for (int j = 0; j < MaxColumnsNumber; j++)
             {
+                FieldIndex fIdx = new FieldIndex(i, j);
                 Cell cell = Instantiate(_cellPrefabs[0], _cellsContainer);
-                Vector2 pos = GetPositionFromFieldIndex(new FieldIndex(i, j));
-                cell.Init(new FieldIndex(i, j), 0, pos);
+                Vector2 pos = GetPositionFromFieldIndex(fIdx);
+                cell.Init(fIdx, 0, pos);
                 
                 _cells[i, j] = cell;
             }
@@ -369,7 +370,7 @@ public class LevelEditor : MonoBehaviour
     
     private void InitConditionsAndProbabilities()
     {
-        _victoryConditions = _levelData._victoryConditions;
+        _victoryConditions = _levelData._levelPassConditions;
         _specialItemGenerationProbability = _levelData._specialItemGenerationProbability;
         _bombItemGenerationProbability = _levelData._bombItemGenerationProbability;
         _vertBombItemGenerationProbability = _levelData._vertBombItemGenerationProbability;
@@ -380,7 +381,7 @@ public class LevelEditor : MonoBehaviour
     
     private void InitDefaultConditionsAndProbabilities()
     {
-        _victoryConditions = new List<VictoryCondition> { new VictoryCondition(VictoryCondition.Type.CellDetonate, 0) };
+        _victoryConditions = new List<LevelPassCondition> { new LevelPassCondition(LevelPassCondition.Type.CellDetonate, 0) };
         _specialItemGenerationProbability = 0;
         _bombItemGenerationProbability = 0;
         _vertBombItemGenerationProbability = 0;

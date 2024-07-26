@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6958226217498079068}
   - component: {fileID: 3355773858842410157}
   m_Layer: 0
-  m_Name: VCImage
+  m_Name: LPCImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29,6 +29,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6958226217548000246}
   m_RootOrder: 0
@@ -102,7 +103,7 @@ GameObject:
   - component: {fileID: 6958226217548000246}
   - component: {fileID: 6958226217548000247}
   m_Layer: 0
-  m_Name: VictoryConditionView
+  m_Name: LPCView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -118,6 +119,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6958226217498079043}
   - {fileID: 20352630394029432}
@@ -141,25 +143,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46891e4f33f113247a3a59ecdce16461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scalerVfxPrefab: {fileID: 5195560713962962122, guid: 7c7bd75dffe5b4f46b06a945a9d8452c, type: 3}
-  _vcImage: {fileID: 6958226217498079068}
-  _vcNumberNeededToCompleteText: {fileID: 1404107521940187400}
-  _vcSpriteInfos:
-  - _vcType: 0
-    _sprite: {fileID: 21300000, guid: 988322cd9c92fe148bb8db883885fa08, type: 3}
-  - _vcType: 1
+  _lpcImage: {fileID: 6958226217498079068}
+  _lpcNumberNeededToCompleteText: {fileID: 1404107521940187400}
+  _lpcSpriteInfos:
+  - _lpcType: 0
+    _sprite: {fileID: 21300000, guid: afbc13b83f7a55b4b9cde9c7ad9b83a8, type: 3}
+  - _lpcType: 1
     _sprite: {fileID: 21300000, guid: 33f8d2a6984fcda4485555e1cc59a0fa, type: 3}
-  - _vcType: 2
+  - _lpcType: 2
     _sprite: {fileID: 21300000, guid: a5d608601ba5d2946a4efc7309680611, type: 3}
-  - _vcType: 3
+  - _lpcType: 3
     _sprite: {fileID: 21300000, guid: 615ff708caf037e49bb86ff1dba65799, type: 3}
-  - _vcType: 4
+  - _lpcType: 4
     _sprite: {fileID: 21300000, guid: 12a5d13c30712ae41b2a456b0197d526, type: 3}
-  - _vcType: 5
+  - _lpcType: 5
     _sprite: {fileID: 21300000, guid: ef6881c0b523e56469ca210824430f3d, type: 3}
-  - _vcType: 6
+  - _lpcType: 6
     _sprite: {fileID: 21300000, guid: dbe6d27171f483f4fb1182599d960e97, type: 3}
-  - _vcType: 7
+  - _lpcType: 7
     _sprite: {fileID: 21300000, guid: 05eb13a3803511a47b829374f2ed871b, type: 3}
 --- !u!1 &7728226025364998696
 GameObject:
@@ -173,7 +174,7 @@ GameObject:
   - component: {fileID: 7111030085368605784}
   - component: {fileID: 1404107521940187400}
   m_Layer: 0
-  m_Name: VCNumberText
+  m_Name: LPCNumberText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -189,6 +190,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6958226217548000246}
   m_RootOrder: 1

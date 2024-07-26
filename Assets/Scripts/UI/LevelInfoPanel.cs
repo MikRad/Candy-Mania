@@ -11,12 +11,12 @@ public class LevelInfoPanel : UIView
     [SerializeField] private TextMeshProUGUI _timeText;
     [SerializeField] private TextMeshProUGUI _scoreText;
     [SerializeField] private Text _possibleMovesText; // DEBUG
-    [SerializeField] private Transform _vcViewsContainerTransform;
-    [SerializeField] private HorizontalLayoutGroup _vcViewsContainerLayout;
-    [SerializeField] private VictoryConditionView _vcViewPrefab;
-    [SerializeField] private int __vcViewsContainerPadding = 120;
+    [SerializeField] private Transform _lpcViewsContainerTransform;
+    [SerializeField] private HorizontalLayoutGroup _lpcViewsContainerLayout;
+    [SerializeField] private LevelPassConditionView _lpcViewPrefab;
+    [SerializeField] private int __lpcViewsContainerPadding = 120;
     
-    private readonly Dictionary<VictoryCondition.Type, VictoryConditionView> _vcViewsMap = new Dictionary<VictoryCondition.Type, VictoryConditionView>();
+    private readonly Dictionary<LevelPassCondition.Type, LevelPassConditionView> _lpcViewsMap = new Dictionary<LevelPassCondition.Type, LevelPassConditionView>();
 
     private Color _timeTextNormalColor;
     private Transform _timeTextTransform;
@@ -29,24 +29,15 @@ public class LevelInfoPanel : UIView
         _timeTextNormalColor = _timeText.color;
     }
 
-    public void Init(IEnumerable<KeyValuePair<VictoryCondition.Type, VictoryCondition>> vicCons, int score, float timeRemained, int possibleMovesNum)
+    public void Init(IEnumerable<LevelPassCondition> lpConditions, int score, float timeRemained)
     {
         _timeText.color = _timeTextNormalColor;
         
-        RemoveOldVCViews();
-        CreateNewVCViews(vicCons);
+        RemoveOldLPCViews();
+        CreateNewLPCViews(lpConditions);
         
         SetTimeRemained(timeRemained);
         SetScore(score);
-        SetPossibleMoves(possibleMovesNum);
-    }
-
-    public void SetVictoryCondition(VictoryCondition vicCondition)
-    {
-        if(_vcViewsMap.TryGetValue(vicCondition._victoryConditionType, out VictoryConditionView vConView))
-        {
-            vConView.UpdateView(vicCondition._numberNeededToComplete);
-        }
     }
 
     public void SetTimeRemained(float timeRemained)
@@ -58,63 +49,85 @@ public class LevelInfoPanel : UIView
         _timeText.text = $"{mins} : {secsPrefix}{secs}";
     }
 
-    public void HandleTimeAlarm()
+    protected override void AddElementsListeners()
+    {
+        EventBus.Get.Subscribe<LevelTimeExpiringEvent>(HandleTimeAlarm);
+        EventBus.Get.Subscribe<PossibleMovesChangedEvent>(HandlePossibleMovesChanged);
+        EventBus.Get.Subscribe<ScoreChangedEvent>(HandleScoreChanged);
+        EventBus.Get.Subscribe<LevelPassConditionUpdatedEvent>(HandleLevelPassConditionUpdated);
+        
+        _settingsButton.onClick.AddListener(HandleSettingsClick);
+    }
+
+    protected override void RemoveElementsListeners()
+    {
+        EventBus.Get.Unsubscribe<LevelTimeExpiringEvent>(HandleTimeAlarm);
+        EventBus.Get.Unsubscribe<PossibleMovesChangedEvent>(HandlePossibleMovesChanged);
+        EventBus.Get.Unsubscribe<ScoreChangedEvent>(HandleScoreChanged);
+        EventBus.Get.Unsubscribe<LevelPassConditionUpdatedEvent>(HandleLevelPassConditionUpdated);
+        
+        _settingsButton.onClick.RemoveListener(HandleSettingsClick);
+    }
+
+    protected override void SetEnableElements(bool isEnabled)
+    {
+        _settingsButton.enabled = isEnabled;
+    }
+
+    private void CreateNewLPCViews(IEnumerable<LevelPassCondition> lpConditions)
+    {
+        foreach (LevelPassCondition condition in lpConditions)
+        {
+            LevelPassConditionView lpcView = Instantiate(_lpcViewPrefab, _lpcViewsContainerTransform);
+            lpcView.InitView(condition._levelPassConditionType, condition._numberNeededToComplete);
+            _lpcViewsMap.Add(condition._levelPassConditionType, lpcView);
+        }
+        
+        _lpcViewsContainerLayout.padding.left = _lpcViewsContainerLayout.padding.right = (_lpcViewsMap.Count < 3) ? __lpcViewsContainerPadding : 0;
+    }
+
+    private void RemoveOldLPCViews()
+    {
+        if (_lpcViewsMap.Count > 0)
+        {
+            foreach (KeyValuePair<LevelPassCondition.Type, LevelPassConditionView> entry in _lpcViewsMap)
+            {
+                Destroy(entry.Value.gameObject);
+            }
+            _lpcViewsMap.Clear();
+        }
+    }
+    
+    private void SetScore(int scoreValue)
+    {
+        _scoreText.text = $"{scoreValue}";
+    }
+    
+    private void HandleScoreChanged(ScoreChangedEvent ev)
+    {
+        SetScore(ev.TotalScore);
+    }
+
+    private void HandleTimeAlarm()
     {
         _timeText.color = _timeTextAlarmColor;
 
         VfxController.Instance.AddScalerVfx(VfxType.Scaler)
             .SetTarget(_timeTextTransform);
     }
-
-    public void SetPossibleMoves(int movesNumber)
+    
+    private void HandleLevelPassConditionUpdated(LevelPassConditionUpdatedEvent ev)
     {
-        _possibleMovesText.text = $"DEBUG: POSSIBLE SUCCESSFUL MOVES - {movesNumber}";
-    }
-
-    public void SetScore(int scoreValue)
-    {
-        _scoreText.text = $"{scoreValue}";
-    }
-
-    protected override void AddElementsListeners()
-    {
-        _settingsButton.onClick.AddListener(HandleSettingsClick);
-    }
-
-    protected override void RemoveElementsListeners()
-    {
-        _settingsButton.onClick.RemoveListener(HandleSettingsClick);
+        if(_lpcViewsMap.TryGetValue(ev.PassConditionType, out LevelPassConditionView lpcView))
+        {
+            lpcView.UpdateView(ev.NumberToComplete);
+        }
     }
     
-    protected override void SetEnableElements(bool isEnabled)
+    private void HandlePossibleMovesChanged(PossibleMovesChangedEvent ev)
     {
-        _settingsButton.enabled = isEnabled;
+        _possibleMovesText.text = $"DEBUG: POSSIBLE SUCCESSFUL MOVES - {ev.PossibleMoves}";
     }
-
-    private void CreateNewVCViews(IEnumerable<KeyValuePair<VictoryCondition.Type, VictoryCondition>> vicCons)
-    {
-        foreach (KeyValuePair<VictoryCondition.Type, VictoryCondition> entry in vicCons)
-        {
-            VictoryConditionView vcView = Instantiate(_vcViewPrefab, _vcViewsContainerTransform);
-            vcView.InitView(entry.Key, entry.Value._numberNeededToComplete);
-            _vcViewsMap.Add(entry.Key, vcView);
-        }
-        
-        _vcViewsContainerLayout.padding.left = _vcViewsContainerLayout.padding.right = (_vcViewsMap.Count < 3) ? __vcViewsContainerPadding : 0;
-    }
-
-    private void RemoveOldVCViews()
-    {
-        if (_vcViewsMap.Count > 0)
-        {
-            foreach (KeyValuePair<VictoryCondition.Type, VictoryConditionView> entry in _vcViewsMap)
-            {
-                Destroy(entry.Value.gameObject);
-            }
-            _vcViewsMap.Clear();
-        }
-    }
-
     
     private void HandleSettingsClick()
     {

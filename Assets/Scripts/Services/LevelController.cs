@@ -1,5 +1,4 @@
 using DG.Tweening;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -7,7 +6,7 @@ using Random = UnityEngine.Random;
 public class LevelController : MonoBehaviour
 {
     private enum LevelState { Initialisation, Idle, ItemsSwap, ItemsDetonation, ItemsFall, Finalisation }
-    private enum LevelResult { Uncertain, AllConditionsReached, NoMoves, TimeExpired }
+    private enum LevelResult { Uncertain, AllConditionsReached, NoMoreMoves, TimeExpired }
 
     [Header("Prefabs")] 
     [SerializeField] private Cell _cellPrefab;
@@ -29,13 +28,15 @@ public class LevelController : MonoBehaviour
     private Cell[,] _cells;
 
     private int _currentComboCount = 1;
+    private int _maxComboCount = 1;
+    
     private float _currentTimeToHint;
 
     private readonly LinkedList<GameItem> _hintedGameItems = new LinkedList<GameItem>();
     private readonly LinkedList<GameItem> _swappingGameItems = new LinkedList<GameItem>();
     private LinkedList<Cell> _detonatingItemsCells;
-    private List<CellsPair> _possibleSuccessfulMoves;
     private LinkedList<Cell> _fallingOldItemsCells;
+    private List<CellsPair> _possibleSuccessfulMoves;
     private int _fallingItemsNumber;
 
     private LevelState _currentState;
@@ -45,18 +46,13 @@ public class LevelController : MonoBehaviour
     private CellsProcessor _cellsProcessor;
     private MoveProcessor _moveProcessor;
     private GameItemSpawner _gameItemSpawner;
-    private VictoryConditionsUpdater _victoryConditionsUpdater;
+    private LevelPassConditionsUpdater _levelPassConditionsUpdater;
     private UIViewsController _uiViewsController;
     private GameProgressController _gameProgressController;
     private CameraHolder _cameraHolder;
     private GamefieldShakerVfx _gamefieldShaker;
 
-    public int MaxComboCount { get; private set; } = 1;
-    public float LevelTimePlayed => _levelTimer.TimePlayed;
     private bool IsLevelFinished => _levelResult != LevelResult.Uncertain;
-
-    public event Action OnLevelCompleted;
-    public event Action OnLevelFailed;
 
     private void Update()
     {
@@ -66,7 +62,7 @@ public class LevelController : MonoBehaviour
 
     private void OnDestroy()
     {
-        RemoveServiceEventHandlers();
+        RemoveEventHandlers();
     }
 
     public void Init(AppSettings settings, GameProgressController progressController)
@@ -83,7 +79,7 @@ public class LevelController : MonoBehaviour
 
         _cameraHolder = CameraHolder.Instance;
         _uiViewsController = UIViewsController.Instance;
-        _victoryConditionsUpdater = new VictoryConditionsUpdater();
+        _levelPassConditionsUpdater = new LevelPassConditionsUpdater();
         _cellsProcessor = new CellsProcessor(_maxRowsNumber, _maxColumnsNumber, _minMatchNumber);
         _moveProcessor = new MoveProcessor(_cellsProcessor, settings._minDragDelta, PerformMove);
         _levelTimer = new LevelTimer(settings._levelTimeAlarm);
@@ -92,7 +88,7 @@ public class LevelController : MonoBehaviour
 
         DOTween.SetTweensCapacity(100, 100);
         
-        AddServiceEventHandlers();
+        AddEventHandlers();
     }
 
     public void InitLevel(int levNumber)
@@ -100,7 +96,7 @@ public class LevelController : MonoBehaviour
         SetState(LevelState.Initialisation);
 
         _levelNumber = levNumber;
-        MaxComboCount = _currentComboCount = 1;
+        _maxComboCount = _currentComboCount = 1;
         LevelData levelData = LevelData.Load("level" + _levelNumber);
 
         RemoveOldCells();
@@ -109,9 +105,10 @@ public class LevelController : MonoBehaviour
         InitConditions(levelData);
         InitCells(levelData);
 
-        _possibleSuccessfulMoves = _cellsProcessor.GetPossibleSuccessfulMoves();
-        _uiViewsController.SetLevelInfoInitData(_victoryConditionsUpdater.Conditions,
-            _gameProgressController.TotalScore, _levelTimer.TimeRemained, _possibleSuccessfulMoves.Count / 2);
+        UpdatePossibleMoves();
+        
+        _uiViewsController.InitLevelInfoData(levelData._levelPassConditions,
+            _gameProgressController.TotalScore, _levelTimer.TimeRemained);
 
         _currentTimeToHint = _hintsInterval;
         
@@ -228,7 +225,7 @@ public class LevelController : MonoBehaviour
         {
             if (cell.HandleItemDetonation())
             {
-                _victoryConditionsUpdater.UpdateVictoryCondition(VictoryCondition.Type.CellDetonate);
+                _levelPassConditionsUpdater.UpdateVictoryCondition(LevelPassCondition.Type.CellDetonate);
             }
         }
     }
@@ -240,28 +237,14 @@ public class LevelController : MonoBehaviour
         _fallingItemsNumber = _fallingOldItemsCells.Count + fallingNewItemsNumber;
     }
 
-    private void HandleHintCompleted(GameItem gItem)
+    private void HandleHintCompleted(GameItemHintCompletedEvent ev)
     {
-        _hintedGameItems.Remove(gItem);
+        _hintedGameItems.Remove(ev.Item);
+        
         if (_hintedGameItems.Count == 0)
         {
             _currentTimeToHint = _hintsInterval / 2;
         }
-    }
-
-    private void HandleGameItemSpawned(GameItem gItem)
-    {
-        AddGameItemEventHandlers(gItem);
-    }
-
-    private void HandleGameItemDestroyed(GameItem gItem)
-    {
-        RemoveGameItemEventHandlers(gItem);
-    }
-
-    private void HandleVictoryConditionUpdated(VictoryCondition victoryCondition)
-    {
-        _uiViewsController.SetLevelInfoVictoryCondition(victoryCondition);
     }
 
     private void TerminateHint()
@@ -273,9 +256,9 @@ public class LevelController : MonoBehaviour
         _hintedGameItems.Clear();
     }
 
-    private void HandleItemSwapCompleted(GameItem gameItem)
+    private void HandleItemSwapCompleted(GameItemSwapCompletedEvent ev)
     {
-        _swappingGameItems.Remove(gameItem);
+        _swappingGameItems.Remove(ev.Item);
         
         if (_swappingGameItems.Count == 0)
         {
@@ -293,7 +276,7 @@ public class LevelController : MonoBehaviour
         }
     }
 
-    private void HandleItemFallCompleted(GameItem gItem)
+    private void HandleItemFallCompleted()
     {
         _fallingItemsNumber--;
 
@@ -303,8 +286,7 @@ public class LevelController : MonoBehaviour
             _fallingOldItemsCells.Clear();
             if (_detonatingItemsCells.Count == 0)
             {
-                _possibleSuccessfulMoves = _cellsProcessor.GetPossibleSuccessfulMoves();
-                _uiViewsController.SetLevelInfoPossibleMoves(_possibleSuccessfulMoves.Count / 2);
+                UpdatePossibleMoves();
 
                 SetState(LevelState.Idle);
                 _currentTimeToHint = _hintsInterval;
@@ -317,21 +299,21 @@ public class LevelController : MonoBehaviour
                 VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
                     .SetText($"{LevelMessages.Combo} {_currentComboCount} X", FlyingMessage.MessageType.Positive);
 
-                if (_currentComboCount > MaxComboCount)
-                    MaxComboCount = _currentComboCount;
+                if (_currentComboCount > _maxComboCount)
+                    _maxComboCount = _currentComboCount;
 
                 SetState(LevelState.ItemsDetonation);
             }
         }
     }
 
-    private void HandleItemDetonationCompleted(GameItem gItem)
+    private void HandleItemDetonationCompleted(GameItemDetonationCompletedEvent ev)
     {
         foreach (Cell cell in _detonatingItemsCells)
         {
-            if (cell.GameItem == gItem)
+            if (cell.GameItem == ev.Item)
             {
-                _victoryConditionsUpdater.UpdateVictoryCondition(gItem.GetVictoryType());
+                _levelPassConditionsUpdater.UpdateVictoryCondition(ev.Item.GetPassConditionType());
                 cell.RemoveGameItem();
                 cell.IsAddedForDetonation = false;
                 cell.DetonationDelayFactor = 0;
@@ -339,7 +321,6 @@ public class LevelController : MonoBehaviour
                 if (cell.CausedDetonationsNumber > 0)
                 {
                     _gameProgressController.AddScore(cell);
-                    _uiViewsController.SetLevelInfoScore(_gameProgressController.TotalScore);
                     cell.CausedDetonationsNumber = 0;
                 }
 
@@ -407,7 +388,9 @@ public class LevelController : MonoBehaviour
                 .SetText($"{LevelMessages.LevelCompleted}", FlyingMessage.MessageType.Positive);
 
             SetState(LevelState.Finalisation);
-            OnLevelCompleted?.Invoke();
+            
+            EventBus.Get.RaiseEvent(this, new LevelCompletedEvent(_gameProgressController.CurrentLevelScore, 
+                _gameProgressController.TotalScore, _maxComboCount, _levelTimer.TimePlayed));
             return;
         }
         
@@ -416,7 +399,7 @@ public class LevelController : MonoBehaviour
             VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
                 .SetText($"{LevelMessages.TimeExpired}", FlyingMessage.MessageType.Negative);
         }
-        else if (_levelResult == LevelResult.NoMoves)
+        else if (_levelResult == LevelResult.NoMoreMoves)
         {
             VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
                 .SetText($"{LevelMessages.NoMoves}", FlyingMessage.MessageType.Negative);
@@ -425,13 +408,14 @@ public class LevelController : MonoBehaviour
         AudioController.Instance.PlaySfx(SfxType.LevelFailed);
             
         SetState(LevelState.Finalisation);
-        OnLevelFailed?.Invoke();
+        
+        EventBus.Get.RaiseEvent(this, new LevelFailedEvent(_gameProgressController.CurrentLevelScore, _levelTimer.TimePlayed));
     }
 
     private void InitConditions(LevelData levelData)
     {
         _levelTimer.Init(levelData._timeLimit);
-        _victoryConditionsUpdater.Init(levelData._victoryConditions);
+        _levelPassConditionsUpdater.Init(levelData._levelPassConditions);
     }
 
     private void RemoveOldCells()
@@ -474,6 +458,12 @@ public class LevelController : MonoBehaviour
         return newItemsNumber;
     }
 
+    private void UpdatePossibleMoves()
+    {
+        _possibleSuccessfulMoves = _cellsProcessor.GetPossibleSuccessfulMoves();
+        EventBus.Get.RaiseEvent(this, new PossibleMovesChangedEvent(_possibleSuccessfulMoves.Count / 2));
+    }
+    
     private void HandleTimeExpiring()
     {
         AudioController.Instance.PlaySfx(SfxType.TimeTick);
@@ -481,7 +471,7 @@ public class LevelController : MonoBehaviour
         VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
             .SetText($"{LevelMessages.TimeExpiring}", FlyingMessage.MessageType.Warning);
         
-        _uiViewsController.SetLevelInfoTimeAlarm();
+        // _uiViewsController.SetLevelInfoTimeAlarm();
     }
 
     private void HandleTimeExpired()
@@ -489,54 +479,42 @@ public class LevelController : MonoBehaviour
         _levelResult = LevelResult.TimeExpired;
     }
     
-    private void HandleAllVictoryConditionsReached()
+    private void HandleAllLevelPassConditionsReached()
     {
         _levelResult = LevelResult.AllConditionsReached;
     }
     
     private void HandleNoMoreMoves()
     {
-        _levelResult = LevelResult.NoMoves;
+        _levelResult = LevelResult.NoMoreMoves;
     }
     
-    private void AddServiceEventHandlers()
+    private void AddEventHandlers()
     {
-        _gameItemSpawner.OnItemSpawned += HandleGameItemSpawned;
-        _victoryConditionsUpdater.OnConditionUpdated += HandleVictoryConditionUpdated;
-        _victoryConditionsUpdater.OnAllConditionsReached += HandleAllVictoryConditionsReached;
-        _cellsProcessor.OnNoMovesDetected += HandleNoMoreMoves;
-        _levelTimer.OnTimeExpiring += HandleTimeExpiring;
-        _levelTimer.OnTimeExpired += HandleTimeExpired;
+        EventBus.Get.Subscribe<LevelTimeExpiringEvent>(HandleTimeExpiring);
+        EventBus.Get.Subscribe<LevelTimeExpiredEvent>(HandleTimeExpired);
+        EventBus.Get.Subscribe<AllLevelPassConditionsReachedEvent>(HandleAllLevelPassConditionsReached);
+        EventBus.Get.Subscribe<NoMoreMovesEvent>(HandleNoMoreMoves);
+        
+        EventBus.Get.Subscribe<GameItemDetonationCompletedEvent>(HandleItemDetonationCompleted);
+        EventBus.Get.Subscribe<GameItemFallCompletedEvent>(HandleItemFallCompleted);
+        EventBus.Get.Subscribe<GameItemSwapCompletedEvent>(HandleItemSwapCompleted);
+        EventBus.Get.Subscribe<GameItemHintCompletedEvent>(HandleHintCompleted);
     }
 
-    private void RemoveServiceEventHandlers()
+    private void RemoveEventHandlers()
     {
-        _gameItemSpawner.OnItemSpawned -= HandleGameItemSpawned;
-        _victoryConditionsUpdater.OnConditionUpdated -= HandleVictoryConditionUpdated;
-        _victoryConditionsUpdater.OnAllConditionsReached -= HandleAllVictoryConditionsReached;
-        _cellsProcessor.OnNoMovesDetected -= HandleNoMoreMoves;
-        _levelTimer.OnTimeExpiring -= HandleTimeExpiring;
-        _levelTimer.OnTimeExpired -= HandleTimeExpired;
+        EventBus.Get.Unsubscribe<LevelTimeExpiringEvent>(HandleTimeExpiring);
+        EventBus.Get.Unsubscribe<LevelTimeExpiredEvent>(HandleTimeExpired);
+        EventBus.Get.Unsubscribe<AllLevelPassConditionsReachedEvent>(HandleAllLevelPassConditionsReached);
+        EventBus.Get.Unsubscribe<NoMoreMovesEvent>(HandleNoMoreMoves);
+        
+        EventBus.Get.Unsubscribe<GameItemDetonationCompletedEvent>(HandleItemDetonationCompleted);
+        EventBus.Get.Unsubscribe<GameItemFallCompletedEvent>(HandleItemFallCompleted);
+        EventBus.Get.Unsubscribe<GameItemSwapCompletedEvent>(HandleItemSwapCompleted);
+        EventBus.Get.Unsubscribe<GameItemHintCompletedEvent>(HandleHintCompleted);
     }
     
-    private void AddGameItemEventHandlers(GameItem gItem)
-    {
-        gItem.OnSwapCompleted += HandleItemSwapCompleted;
-        gItem.OnFallCompleted += HandleItemFallCompleted;
-        gItem.OnDetonationCompleted += HandleItemDetonationCompleted;
-        gItem.OnHintCompleted += HandleHintCompleted;
-        gItem.OnDestroyed += HandleGameItemDestroyed;
-    }
-
-    private void RemoveGameItemEventHandlers(GameItem gItem)
-    {
-        gItem.OnSwapCompleted -= HandleItemSwapCompleted;
-        gItem.OnFallCompleted -= HandleItemFallCompleted;
-        gItem.OnDetonationCompleted -= HandleItemDetonationCompleted;
-        gItem.OnHintCompleted -= HandleHintCompleted;
-        gItem.OnDestroyed -= HandleGameItemDestroyed;
-    }
-
     private Vector2 GetPositionFromFieldIndex(FieldIndex fIdx)
     {
         return new Vector2((fIdx._j * _cellSize) + _cellSize / 2, (-fIdx._i * _cellSize) - _cellSize / 2) +

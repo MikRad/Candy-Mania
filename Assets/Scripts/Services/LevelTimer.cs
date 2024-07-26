@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LevelTimer
 {
@@ -9,9 +8,6 @@ public class LevelTimer
     
     public float TimeRemained { get; private set; }
     public float TimePlayed => (_timeLimit - TimeRemained);
-
-    public event Action OnTimeExpiring;
-    public event Action OnTimeExpired;
 
     public LevelTimer(float alarmValue)
     {
@@ -32,11 +28,11 @@ public class LevelTimer
         if (!_isTimeExpiring && (TimeRemained <= _alarmValue))
         {
             _isTimeExpiring = true;
-            OnTimeExpiring?.Invoke();
+            EventBus.Get.RaiseEvent(this, new LevelTimeExpiringEvent());
         }
         if (TimeRemained <= 0)
         {
-            OnTimeExpired?.Invoke();
+            EventBus.Get.RaiseEvent(this, new LevelTimeExpiredEvent());
         }
     }
 }

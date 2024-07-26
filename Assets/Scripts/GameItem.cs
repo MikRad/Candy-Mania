@@ -1,5 +1,4 @@
 using DG.Tweening;
-using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -46,12 +45,6 @@ public class GameItem : MonoBehaviour
 
     public Transform CachedTransform { get; private set; }
 
-    public event Action<GameItem> OnDetonationCompleted;
-    public event Action<GameItem> OnFallCompleted;
-    public event Action<GameItem> OnDestroyed;
-    public event Action<GameItem> OnSwapCompleted;
-    public event Action<GameItem> OnHintCompleted;
-
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -66,8 +59,6 @@ public class GameItem : MonoBehaviour
     private void OnDestroy()
     {
         _hintAnimationSequence?.Kill();
-        
-        OnDestroyed?.Invoke(this);
     }
 
     public void Init()
@@ -78,7 +69,6 @@ public class GameItem : MonoBehaviour
     public void Remove()
     {
         gameObject.SetActive(false);
-        OnDestroyed?.Invoke(this);
     }
     
     public void SetSelected(bool isSelected)
@@ -197,23 +187,26 @@ public class GameItem : MonoBehaviour
     
     private void HandleSwapCompleted()
     {
-        OnSwapCompleted?.Invoke(this);
+        EventBus.Get.RaiseEvent(this, new GameItemSwapCompletedEvent(this));
     }
 
     private void HandleFallCompleted()
     {
         VfxController.Instance.AddFallenItemVfx().SetTarget(CachedTransform);
-        OnFallCompleted?.Invoke(this);
+        
+        EventBus.Get.RaiseEvent(this, new GameItemFallCompletedEvent(this));
     }
 
     private void HandleHintCompleted()
     {
         _spriteRenderer.sortingOrder = _defaultSortingOrder;
-        OnHintCompleted?.Invoke(this);
+        
+        EventBus.Get.RaiseEvent(this, new GameItemHintCompletedEvent(this));
+        // OnHintCompleted?.Invoke(this);
     }
 
     private void HandleDetonationCompleted()
     {
-        OnDetonationCompleted?.Invoke(this);
+        EventBus.Get.RaiseEvent(this, new GameItemDetonationCompletedEvent(this));
     }
 }

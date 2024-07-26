@@ -14,19 +14,6 @@ public class LevelFailedPanel : UIView
 
     private int _levelScore;
     
-    public void Init(int levelScore, float levelTime)
-    {
-        _levelScore = levelScore;
-        
-        _levelScoreValueText.text = "0";
-
-        int mins = ((int)levelTime) / 60;
-        int secs = ((int)levelTime) % 60;
-        string secsPrefix = (secs >= 10) ? "" : "0";
-
-        _playedTimeValueText.text = $"{mins} : {secsPrefix}{secs}";
-    }
-
     public override void Show()
     {
         SetActive(true);
@@ -38,11 +25,15 @@ public class LevelFailedPanel : UIView
 
     protected override void AddElementsListeners()
     {
+        EventBus.Get.Subscribe<LevelFailedEvent>(Init);
+        
         _restartButton.onClick.AddListener(HandleRestartClick);
     }
 
     protected override void RemoveElementsListeners()
     {
+        EventBus.Get.Unsubscribe<LevelFailedEvent>(Init);
+        
         _restartButton.onClick.RemoveListener(HandleRestartClick);
     }
 
@@ -71,5 +62,18 @@ public class LevelFailedPanel : UIView
         base.HandleHideCompleted();
 
         EventBus.Get.RaiseEvent(this, new UIEvents.LevelFailedPanelRestartClicked());
+    }
+
+    private void Init(LevelFailedEvent ev)
+    {
+        _levelScore = ev.LevelScore;
+        
+        _levelScoreValueText.text = "0";
+
+        int mins = ((int)ev.TimePlayed) / 60;
+        int secs = ((int)ev.TimePlayed) % 60;
+        string secsPrefix = (secs >= 10) ? "" : "0";
+
+        _playedTimeValueText.text = $"{mins} : {secsPrefix}{secs}";
     }
 }

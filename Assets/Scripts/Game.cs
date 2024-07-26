@@ -67,10 +67,9 @@ public class Game : MonoBehaviour
         EventBus.Get.Subscribe<UIEvents.SettingsPanelContinueClicked>(HandleSettingsPanelContinue);
         EventBus.Get.Subscribe<UIEvents.SettingsPanelToMainMenuClicked>(HandleSettingsPanelToMainMenu);
         EventBus.Get.Subscribe<UIEvents.LevelInfoPanelSettingsClicked>(HandleLevelInfoPanelSettingsClicked);
-        
-        _levelController.OnLevelCompleted += HandleLevelCompleted;
-        _levelController.OnLevelFailed += HandleLevelFailed;
-        _progressController.OnAllLevelsCompleted += HandleAllLevelsCompleted;
+        EventBus.Get.Subscribe<LevelCompletedEvent>(HandleLevelCompleted);
+        EventBus.Get.Subscribe<LevelFailedEvent>(HandleLevelFailed);
+        EventBus.Get.Subscribe<AllLevelsCompletedEvent>(HandleAllLevelsCompleted);
     }
 
     private void RemoveServicesEventHandlers()
@@ -80,10 +79,9 @@ public class Game : MonoBehaviour
         EventBus.Get.Unsubscribe<UIEvents.SettingsPanelContinueClicked>(HandleSettingsPanelContinue);
         EventBus.Get.Unsubscribe<UIEvents.SettingsPanelToMainMenuClicked>(HandleSettingsPanelToMainMenu);
         EventBus.Get.Unsubscribe<UIEvents.LevelInfoPanelSettingsClicked>(HandleLevelInfoPanelSettingsClicked);
-        
-        _levelController.OnLevelCompleted -= HandleLevelCompleted;
-        _levelController.OnLevelFailed -= HandleLevelFailed;
-        _progressController.OnAllLevelsCompleted -= HandleAllLevelsCompleted;
+        EventBus.Get.Unsubscribe<LevelCompletedEvent>(HandleLevelCompleted);
+        EventBus.Get.Unsubscribe<LevelFailedEvent>(HandleLevelFailed);
+        EventBus.Get.Unsubscribe<AllLevelsCompletedEvent>(HandleAllLevelsCompleted);
     }
 
     private void HandleLevelInfoPanelSettingsClicked()
@@ -118,7 +116,6 @@ public class Game : MonoBehaviour
 
         _uiViewsController.HideUIView(UIViewType.LevelInfoPanel);
         
-        _uiViewsController.SetLevelCompletedInitData(_progressController.CurrentLevelScore, _progressController.TotalScore, _levelController.MaxComboCount, _levelController.LevelTimePlayed);
         _uiViewsController.ShowUIView(UIViewType.LevelCompletedPanel);
     }
 
@@ -128,7 +125,6 @@ public class Game : MonoBehaviour
 
         _uiViewsController.HideUIView(UIViewType.LevelInfoPanel);        
         
-        _uiViewsController.SetLevelFailedInitData(_progressController.CurrentLevelScore, _levelController.LevelTimePlayed);
         _uiViewsController.ShowUIView(UIViewType.LevelFailedPanel);
     }
 

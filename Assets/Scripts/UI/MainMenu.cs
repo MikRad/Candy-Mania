@@ -30,7 +30,7 @@ public class MainMenu : MonoBehaviour
         _progressController = GameProgressController.Instance;
         _progressController.SetTotalLevelsNumber(_settings._levelsNumberTotal);
         _uiViewsController = UIViewsController.Instance;
-        _uiViewsController.SetLevelButtonsInitData(_progressController.MaxReachedLevelNumber, _progressController.LevelsNumberTotal);
+        _uiViewsController.InitLevelButtonsData(_progressController.MaxReachedLevelNumber, _progressController.LevelsNumberTotal);
     }
 
     private void AddUIEventsHandlers()

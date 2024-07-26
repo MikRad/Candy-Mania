@@ -24,22 +24,12 @@ public class EventBinding<T> where T : struct, IEvent
 
     public void Remove(EventCallback<T> callback)
     {
-        EventHandler handlerToRemove = Handlers.FirstOrDefault(h => h.CallbackWithArg.Equals(callback));
-            
-        if (handlerToRemove != null)
-        {
-            Handlers.Remove(handlerToRemove);
-        }
+        Handlers.RemoveAll(h => h.CallbackWithArg != null && h.CallbackWithArg.Equals(callback));
     }
     
     public void Remove(Action callback)
     {
-        EventHandler handlerToRemove = Handlers.FirstOrDefault(h => h.CallbackNoArgs.Equals(callback));
-            
-        if (handlerToRemove != null)
-        {
-            Handlers.Remove(handlerToRemove);
-        }
+        Handlers.RemoveAll(h => h.CallbackNoArgs != null && h.CallbackNoArgs.Equals(callback));
     }
 
     public void Raise(T ev)

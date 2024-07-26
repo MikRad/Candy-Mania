@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,8 +10,6 @@ public class CellsProcessor
 
     public Cell[,] Cells { get; set; }
 
-    public event Action OnNoMovesDetected;
-    
     public CellsProcessor(int rowsNumber, int columnsNumber, int minMatchNumber)
     {
         RowsNumber = rowsNumber;
@@ -30,14 +27,14 @@ public class CellsProcessor
     
     public bool IsCorrectPossibleMove(CellsPair selectedCells)
     {
-        List<Cell> possibleMoveCells = GetPossibleMoveCells(selectedCells.FirstCell.Index);
+        LinkedList<Cell> possibleMoveCells = GetPossibleMoveCells(selectedCells.FirstCell.Index);
         
         return possibleMoveCells.Contains(selectedCells.SecondCell);
     }
 
     public bool IsCorrectFieldIndex(FieldIndex fIdx)
     {
-        return ((fIdx._i >= 0) && (fIdx._i < RowsNumber) && (fIdx._j >= 0) && (fIdx._j < ColumnsNumber));
+        return IsCorrectFieldIndex(fIdx._i, fIdx._j);
     }
     
     public LinkedList<Cell> SwapItemsBetweenCells(CellsPair cPair)
@@ -128,7 +125,7 @@ public class CellsProcessor
                 if (!cell.IsAvailable)
                     continue;
 
-                List<Cell> possibleMoveCells = GetPossibleMoveCells(cell.Index);
+                LinkedList<Cell> possibleMoveCells = GetPossibleMoveCells(cell.Index);
                 foreach (Cell possibleMoveCell in possibleMoveCells)
                 {
                     CellsPair cPair = new CellsPair(cell, possibleMoveCell);
@@ -142,7 +139,7 @@ public class CellsProcessor
 
         if (possibleSuccessfulMoves.Count == 0)
         {
-            OnNoMovesDetected?.Invoke();
+            EventBus.Get.RaiseEvent(this, new NoMoreMovesEvent());
         }
         
         return possibleSuccessfulMoves;
@@ -157,19 +154,19 @@ public class CellsProcessor
         AddUniqueCellsToList(matchesList, matchesToAdd);
     }
     
-    private List<Cell> GetPossibleMoveCells(FieldIndex fIdx)
+    private LinkedList<Cell> GetPossibleMoveCells(FieldIndex fIdx)
     {
-        List<Cell> neighbors = new List<Cell>();
+        LinkedList<Cell> neighbors = new LinkedList<Cell>();
+        FieldIndex[] moveDeltas = { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
 
-        if (((fIdx._i + 1) < RowsNumber) && (Cells[fIdx._i + 1, fIdx._j].IsAvailable))
-            neighbors.Add(Cells[fIdx._i + 1, fIdx._j]);
-        if (((fIdx._i - 1) >= 0) && (Cells[fIdx._i - 1, fIdx._j].IsAvailable))
-            neighbors.Add(Cells[fIdx._i - 1, fIdx._j]);
-        if (((fIdx._j + 1) < ColumnsNumber) && (Cells[fIdx._i, fIdx._j + 1].IsAvailable))
-            neighbors.Add(Cells[fIdx._i, fIdx._j + 1]);
-        if (((fIdx._j - 1) >= 0) && (Cells[fIdx._i, fIdx._j - 1].IsAvailable))
-            neighbors.Add(Cells[fIdx._i, fIdx._j - 1]);
-
+        foreach (FieldIndex delta in moveDeltas)
+        {
+            FieldIndex idx = new FieldIndex(fIdx._i + delta._i, fIdx._j + delta._j);
+            
+            if ((IsCorrectFieldIndex(idx)) && (Cells[idx._i, idx._j].IsAvailable))
+                neighbors.AddLast(Cells[idx._i, idx._j]);
+        }
+        
         return neighbors;
     }
     
@@ -177,83 +174,60 @@ public class CellsProcessor
     {
         LinkedList<Cell> adjCells = new LinkedList<Cell>();
 
-        if (((fIdx._i + 1) < RowsNumber) && (Cells[fIdx._i + 1, fIdx._j].IsAvailable))
-            adjCells.AddLast(Cells[fIdx._i + 1, fIdx._j]);
-        if (((fIdx._i - 1) >= 0) && (Cells[fIdx._i - 1, fIdx._j].IsAvailable))
-            adjCells.AddLast(Cells[fIdx._i - 1, fIdx._j]);
-        if (((fIdx._j + 1) < ColumnsNumber) && (Cells[fIdx._i, fIdx._j + 1].IsAvailable))
-            adjCells.AddLast(Cells[fIdx._i, fIdx._j + 1]);
-        if (((fIdx._j - 1) >= 0) && (Cells[fIdx._i, fIdx._j - 1].IsAvailable))
-            adjCells.AddLast(Cells[fIdx._i, fIdx._j - 1]);
+        FieldIndex[] adjDeltas =
+        {
+            new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
+            new(1, 1), new(1, -1), new(-1, 1), new(-1, -1),
+        };
 
-        if (((fIdx._i + 1) < RowsNumber) && ((fIdx._j + 1) < ColumnsNumber) && (Cells[fIdx._i + 1, fIdx._j + 1].IsAvailable))
-            adjCells.AddLast(Cells[fIdx._i + 1, fIdx._j + 1]);
-        if (((fIdx._i + 1) < RowsNumber) && ((fIdx._j - 1) >= 0) && (Cells[fIdx._i + 1, fIdx._j - 1].IsAvailable))
-            adjCells.AddLast(Cells[fIdx._i + 1, fIdx._j - 1]);
-        if (((fIdx._i - 1) >= 0) && ((fIdx._j + 1) < ColumnsNumber) && (Cells[fIdx._i - 1, fIdx._j + 1].IsAvailable))
-            adjCells.AddLast(Cells[fIdx._i - 1, fIdx._j + 1]);
-        if (((fIdx._i - 1) >= 0) && ((fIdx._j - 1) >= 0) && (Cells[fIdx._i - 1, fIdx._j - 1].IsAvailable))
-            adjCells.AddLast(Cells[fIdx._i - 1, fIdx._j - 1]);
+        foreach (FieldIndex delta in adjDeltas)
+        {
+            FieldIndex idx = new FieldIndex(fIdx._i + delta._i, fIdx._j + delta._j);
+            
+            if ((IsCorrectFieldIndex(idx)) && (Cells[idx._i, idx._j].IsAvailable))
+                adjCells.AddLast(Cells[idx._i, idx._j]);
+        }
 
         return adjCells;
     }
-    
-    private LinkedList<Cell> GetAvailableUpCells(FieldIndex fIdx)
-    {
-        LinkedList<Cell> upCells = new LinkedList<Cell>();
-        for (int i = fIdx._i - 1; i >= 0; i--)
-        {
-            Cell c = Cells[i, fIdx._j];
-            if ((c != null) && c.IsAvailable && !c.IsEmpty)
-                upCells.AddLast(c);
-            else break;
-        }
 
-        return upCells;
+    private LinkedList<Cell> GetAvailableHorizontalCells(FieldIndex fIdx)
+    {
+        LinkedList<Cell> horCells = GetAvailableCellsForDirection(fIdx, new FieldIndex(0, -1));
+        horCells.AppendRange(GetAvailableCellsForDirection(fIdx, new FieldIndex(0, 1)));
+        
+        return horCells;
     }
     
-    private LinkedList<Cell> GetAvailableDownCells(FieldIndex fIdx)
+    private LinkedList<Cell> GetAvailableVerticalCells(FieldIndex fIdx)
     {
-        LinkedList<Cell> downCells = new LinkedList<Cell>();
-        for (int i = fIdx._i + 1; i < RowsNumber; i++)
+        LinkedList<Cell> vertCells = GetAvailableCellsForDirection(fIdx, new FieldIndex(-1, 0));
+        vertCells.AppendRange(GetAvailableCellsForDirection(fIdx, new FieldIndex(1, 0)));
+        
+        return vertCells;
+    }
+    
+    private LinkedList<Cell> GetAvailableCellsForDirection(FieldIndex fIdx, FieldIndex idxDelta)
+    {
+        LinkedList<Cell> availableCells = new LinkedList<Cell>();
+    
+        int i = fIdx._i + idxDelta._i;
+        int j = fIdx._j + idxDelta._j;
+        
+        while (IsCorrectFieldIndex(i, j))
         {
-            Cell c = Cells[i, fIdx._j];
+            Cell c = Cells[i, j];
             if ((c != null) && c.IsAvailable && !c.IsEmpty)
-                downCells.AddLast(c);
+                availableCells.AddLast(c);
             else break;
+            
+            i += idxDelta._i;
+            j += idxDelta._j;
         }
         
-        return downCells;
+        return availableCells;
     }
     
-    private LinkedList<Cell> GetAvailableLeftCells(FieldIndex fIdx)
-    {
-        LinkedList<Cell> leftCells = new LinkedList<Cell>();
-        for (int j = fIdx._j - 1; j >= 0; j--)
-        {
-            Cell c = Cells[fIdx._i, j];
-            if ((c != null) && c.IsAvailable && !c.IsEmpty)
-                leftCells.AddLast(c);
-            else break;
-        }
-
-        return leftCells;
-    }
-
-    private LinkedList<Cell> GetAvailableRightCells(FieldIndex fIdx)
-    {
-        LinkedList<Cell> rightCells = new LinkedList<Cell>();
-        for (int j = fIdx._j + 1; j < ColumnsNumber; j++)
-        {
-            Cell c = Cells[fIdx._i, j];
-            if ((c != null) && c.IsAvailable && !c.IsEmpty)
-                rightCells.AddLast(c);
-            else break;
-        }
-
-        return rightCells;
-    }
-
     private LinkedList<Cell> GetMatches(Cell cell)
     {
         return GetMatches(cell, cell.GameItem.BaseItemType);
@@ -262,9 +236,11 @@ public class CellsProcessor
     private LinkedList<Cell> GetHorizontalMatches(Cell cell, GameItemType gItemType)
     {
         LinkedList<Cell> horMatches = new LinkedList<Cell>();
-        FillMatchesFromCells(horMatches, GetAvailableLeftCells(cell.Index), gItemType);
-        FillMatchesFromCells(horMatches, GetAvailableRightCells(cell.Index), gItemType);
-
+        // FillMatches(horMatches, GetAvailableHorizontalCells(cell.Index), gItemType);
+        
+        FillMatches(horMatches, GetAvailableCellsForDirection(cell.Index, new FieldIndex(0, -1)), gItemType);
+        FillMatches(horMatches, GetAvailableCellsForDirection(cell.Index, new FieldIndex(0, 1)), gItemType);
+        
         if (!IsEnoughMatches(horMatches))
             horMatches.Clear();
 
@@ -274,8 +250,10 @@ public class CellsProcessor
     private LinkedList<Cell> GetVerticalMatches(Cell cell, GameItemType gItemType)
     {
         LinkedList<Cell> vertMatches = new LinkedList<Cell>();
-        FillMatchesFromCells(vertMatches, GetAvailableUpCells(cell.Index), gItemType);
-        FillMatchesFromCells(vertMatches, GetAvailableDownCells(cell.Index), gItemType);
+        // FillMatches(vertMatches, GetAvailableVerticalCells(cell.Index), gItemType);
+        
+        FillMatches(vertMatches, GetAvailableCellsForDirection(cell.Index, new FieldIndex(-1, 0)), gItemType);
+        FillMatches(vertMatches, GetAvailableCellsForDirection(cell.Index, new FieldIndex(1, 0)), gItemType);
         
         if (!IsEnoughMatches(vertMatches))
             vertMatches.Clear();
@@ -283,7 +261,7 @@ public class CellsProcessor
         return vertMatches;
     }
 
-    private void FillMatchesFromCells(ICollection<Cell> matchesToFill, IEnumerable<Cell> availableCells, GameItemType gItemType)
+    private void FillMatches(ICollection<Cell> matchesToFill, IEnumerable<Cell> availableCells, GameItemType gItemType)
     {
         GameItemType baseType = GameItemExtension.GetBaseType(gItemType);
         
@@ -389,8 +367,10 @@ public class CellsProcessor
 
     private IEnumerable<Cell> LaunchVerticalBomb(Cell cell)
     {
-        LinkedList<Cell> vertCells = GetAvailableUpCells(cell.Index);
-        vertCells.AppendRange(GetAvailableDownCells(cell.Index));
+        LinkedList<Cell> vertCells = GetAvailableVerticalCells(cell.Index);
+        
+        // LinkedList<Cell> vertCells = GetAvailableCellsForDirection(cell.Index, new FieldIndex(-1, 0));
+        // vertCells.AppendRange(GetAvailableCellsForDirection(cell.Index, new FieldIndex(1, 0)));
         
         foreach (Cell c in vertCells)
         {
@@ -407,8 +387,10 @@ public class CellsProcessor
 
     private IEnumerable<Cell> LaunchHorizontalBomb(Cell cell)
     {
-        LinkedList<Cell> horCells = GetAvailableLeftCells(cell.Index);
-        horCells.AppendRange(GetAvailableRightCells(cell.Index));
+        // LinkedList<Cell> horCells = GetAvailableCellsForDirection(cell.Index, new FieldIndex(0, -1));
+        // horCells.AppendRange(GetAvailableCellsForDirection(cell.Index, new FieldIndex(0, 1)));
+        
+        LinkedList<Cell> horCells = GetAvailableHorizontalCells(cell.Index);
         
         foreach (Cell c in horCells)
         {
@@ -447,5 +429,10 @@ public class CellsProcessor
         GameItem tmpItem = Cells[idx1._i, idx1._j].GameItem;
         Cells[idx1._i, idx1._j].GameItem = Cells[idx2._i, idx2._j].GameItem;
         Cells[idx2._i, idx2._j].GameItem = tmpItem;
+    }
+
+    private bool IsCorrectFieldIndex(int i, int j)
+    {
+        return ((i >= 0) && (i < RowsNumber) && (j >= 0) && (j < ColumnsNumber));
     }
 }

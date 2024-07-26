@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -31,8 +30,6 @@ public class GameItemSpawner : MonoBehaviour
     
     private List<SpecialItemGenerationData> _specialItemsGenerationDatas;
 
-    public event Action<GameItem> OnItemSpawned; 
-
     public void Init(CellsProcessor cellsProcessor)
     {
         _cellsProcessor = cellsProcessor;
@@ -61,8 +58,6 @@ public class GameItemSpawner : MonoBehaviour
             GameItem gItem = GetGameItemFromPool(gItemType);
             gItem.transform.localPosition = cell.transform.localPosition;
             cell.GameItem = gItem;
-            
-            OnItemSpawned?.Invoke(gItem);
         }
         else if(potentialMatches.Count > 0)
         {
@@ -141,8 +136,6 @@ public class GameItemSpawner : MonoBehaviour
         }
         
         cell.GameItem = gItem;
-        
-        OnItemSpawned?.Invoke(gItem);
     }
 
     private GameItem GetGameItemFromPool(GameItemType type)

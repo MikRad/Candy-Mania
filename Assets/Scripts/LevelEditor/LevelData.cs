@@ -6,7 +6,7 @@ using UnityEngine;
 public class LevelData : ScriptableObject
 {
     public List<CellData> _cellDatas;
-    public List<VictoryCondition> _victoryConditions;
+    public List<LevelPassCondition> _levelPassConditions;
     public int _specialItemGenerationProbability;
     public int _bombItemGenerationProbability;
     public int _vertBombItemGenerationProbability;

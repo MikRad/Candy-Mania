@@ -34,58 +34,22 @@ public class UIViewsController : SingletonMonoBehaviour<UIViewsController>
         _uiViewsMap[viewType].Hide();
     }
 
-    public void SetLevelButtonsInitData(int maxReachedLevel, int levelsNumberTotal)
+    public void InitLevelButtonsData(int maxReachedLevel, int levelsNumberTotal)
     {
         LevelButtonsPanel lbPanel = _uiViewsMap[UIViewType.LevelButtonsPanel] as LevelButtonsPanel;
         lbPanel?.Init(maxReachedLevel, levelsNumberTotal);
     }
 
-    public void SetLevelCompletedInitData(int levelScore, int totalScore, int maxComboCount, float levelTime)
-    {
-        LevelCompletedPanel lcPanel = _uiViewsMap[UIViewType.LevelCompletedPanel] as LevelCompletedPanel;
-        lcPanel?.Init(levelScore, totalScore, maxComboCount, levelTime);
-    }
-
-    public void SetLevelFailedInitData(int levelScore, float levelTime)
-    {
-        LevelFailedPanel lfPanel = _uiViewsMap[UIViewType.LevelFailedPanel] as LevelFailedPanel;
-        lfPanel?.Init(levelScore, levelTime);
-    }
-
-    public void SetLevelInfoInitData(IEnumerable<KeyValuePair<VictoryCondition.Type, VictoryCondition>> vicCons, int score, float timeRemained, int possibleMovesNum)
+    public void InitLevelInfoData(IEnumerable<LevelPassCondition> lpConditions, int score, float timeRemained)
     {
         LevelInfoPanel liPanel = _uiViewsMap[UIViewType.LevelInfoPanel] as LevelInfoPanel;
-        liPanel?.Init(vicCons, score, timeRemained, possibleMovesNum);
+        liPanel?.Init(lpConditions, score, timeRemained);
     }
 
     public void SetLevelInfoTime(float timeRemained)
     {
         LevelInfoPanel liPanel = _uiViewsMap[UIViewType.LevelInfoPanel] as LevelInfoPanel;
         liPanel?.SetTimeRemained(timeRemained);
-    }
-    
-    public void SetLevelInfoScore(int score)
-    {
-        LevelInfoPanel liPanel = _uiViewsMap[UIViewType.LevelInfoPanel] as LevelInfoPanel;
-        liPanel?.SetScore(score);
-    }
-    
-    public void SetLevelInfoVictoryCondition(VictoryCondition victoryCondition)
-    {
-        LevelInfoPanel liPanel = _uiViewsMap[UIViewType.LevelInfoPanel] as LevelInfoPanel;
-        liPanel?.SetVictoryCondition(victoryCondition);
-    }
-    
-    public void SetLevelInfoPossibleMoves(int possibleMoves)
-    {
-        LevelInfoPanel liPanel = _uiViewsMap[UIViewType.LevelInfoPanel] as LevelInfoPanel;
-        liPanel?.SetPossibleMoves(possibleMoves);
-    }
-    
-    public void SetLevelInfoTimeAlarm()
-    {
-        LevelInfoPanel liPanel = _uiViewsMap[UIViewType.LevelInfoPanel] as LevelInfoPanel;
-        liPanel?.HandleTimeAlarm();
     }
     
     private void CreateUIViewsMap()

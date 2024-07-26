@@ -16,22 +16,6 @@ public class LevelCompletedPanel : UIView
     
     private int _levelScore;
     private int _totalScore;
-    
-    public void Init(int levelScore, int totalScore, int maxComboCount, float levelTime)
-    {
-        _levelScore = levelScore;
-        _totalScore = totalScore;
-
-        _levelScoreValueText.text = "0";
-        _totalScoreValueText.text = (totalScore - levelScore).ToString();
-        _maxComboValueText.text = $"X {maxComboCount}";
-
-        int mins = ((int)levelTime) / 60;
-        int secs = ((int)levelTime) % 60;
-        string secsPrefix = (secs >= 10) ? "" : "0";
-
-        _playedTimeValueText.text = $"{mins} : {secsPrefix}{secs}";
-    }
 
     public override void Show()
     {
@@ -44,11 +28,15 @@ public class LevelCompletedPanel : UIView
 
     protected override void AddElementsListeners()
     {
+        EventBus.Get.Subscribe<LevelCompletedEvent>(Init);
+        
         _continueButton.onClick.AddListener(HandleContinueClick);
     }
 
     protected override void RemoveElementsListeners()
     {
+        EventBus.Get.Unsubscribe<LevelCompletedEvent>(Init);
+        
         _continueButton.onClick.AddListener(HandleContinueClick);
     }
 
@@ -78,5 +66,21 @@ public class LevelCompletedPanel : UIView
         base.HandleHideCompleted();
      
         EventBus.Get.RaiseEvent(this, new UIEvents.LevelCompletedPanelContinueClicked());
+    }
+    
+    private void Init(LevelCompletedEvent ev)
+    {
+        _levelScore = ev.LevelScore;
+        _totalScore = ev.TotalScore;
+
+        _levelScoreValueText.text = "0";
+        _totalScoreValueText.text = (_totalScore - _levelScore).ToString();
+        _maxComboValueText.text = $"X {ev.MaxCombo}";
+
+        int mins = ((int)ev.TimePlayed) / 60;
+        int secs = ((int)ev.TimePlayed) % 60;
+        string secsPrefix = (secs >= 10) ? "" : "0";
+
+        _playedTimeValueText.text = $"{mins} : {secsPrefix}{secs}";
     }
 }

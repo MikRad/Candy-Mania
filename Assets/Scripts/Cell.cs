@@ -33,9 +33,9 @@ public class Cell : MonoBehaviour
         CachedTransform = transform;
     }
 
-    public void Init(FieldIndex fIdx, int detsToClear, Vector2 pos, GameItem gItem = null)
+    public void Init(FieldIndex fIdx, int detonsToClear, Vector2 pos, GameItem gItem = null)
     {
-        _detonationsToClear = detsToClear;
+        _detonationsToClear = detonsToClear;
         Index = fIdx;
         CachedTransform.localPosition = pos;
         GameItem = gItem;

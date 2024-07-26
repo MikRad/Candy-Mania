@@ -31,8 +31,6 @@ public class GameProgressController
         }
     }
 
-    public event Action OnAllLevelsCompleted;
-
     private GameProgressController()
     {
         Init();
@@ -57,6 +55,8 @@ public class GameProgressController
             CurrentLevelScore += score;
             TotalScore += score;
             
+            EventBus.Get.RaiseEvent(this, new ScoreChangedEvent(CurrentLevelScore, TotalScore));
+            
             VfxController.Instance.AddFlyingScoreVfx(cell.CachedTransform.position, Quaternion.identity) 
                 .SetText($"+{score}", FlyingMessage.MessageType.Positive);
         }
@@ -78,7 +78,7 @@ public class GameProgressController
 
         if (CurrentLevelNumber == LevelsNumberTotal)
         {
-            OnAllLevelsCompleted?.Invoke();
+            EventBus.Get.RaiseEvent(this, new AllLevelsCompletedEvent());
         }
         else
         {

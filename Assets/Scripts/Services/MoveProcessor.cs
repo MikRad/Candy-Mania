@@ -76,8 +76,7 @@ public class MoveProcessor
         {
             int deltaI = 0, deltaJ = 0;
             
-            // horizontal drag
-            if(Mathf.Abs(dragDelta.x) >= Mathf.Abs(dragDelta.y))
+            if(Mathf.Abs(dragDelta.x) >= Mathf.Abs(dragDelta.y)) // horizontal drag
             {
                 deltaJ = (dragDelta.x > 0) ? 1 : -1;
             }
@@ -85,6 +84,7 @@ public class MoveProcessor
             {
                 deltaI = (dragDelta.y > 0) ? -1 : 1;
             }
+            
             FieldIndex fIdx = new FieldIndex(SelectedCells.FirstCell.Index._i + deltaI, SelectedCells.FirstCell.Index._j + deltaJ);
             if(_cellsProcessor.IsCorrectFieldIndex(fIdx))
             {
