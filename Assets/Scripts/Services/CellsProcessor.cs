@@ -34,7 +34,7 @@ public class CellsProcessor
 
     public bool IsCorrectFieldIndex(FieldIndex fIdx)
     {
-        return IsCorrectFieldIndex(fIdx._i, fIdx._j);
+        return ((fIdx._i >= 0) && (fIdx._i < RowsNumber) && (fIdx._j >= 0) && (fIdx._j < ColumnsNumber));
     }
     
     public LinkedList<Cell> SwapItemsBetweenCells(CellsPair cPair)
@@ -161,7 +161,7 @@ public class CellsProcessor
 
         foreach (FieldIndex delta in moveDeltas)
         {
-            FieldIndex idx = new FieldIndex(fIdx._i + delta._i, fIdx._j + delta._j);
+            FieldIndex idx = fIdx + delta;
             
             if ((IsCorrectFieldIndex(idx)) && (Cells[idx._i, idx._j].IsAvailable))
                 neighbors.AddLast(Cells[idx._i, idx._j]);
@@ -182,7 +182,7 @@ public class CellsProcessor
 
         foreach (FieldIndex delta in adjDeltas)
         {
-            FieldIndex idx = new FieldIndex(fIdx._i + delta._i, fIdx._j + delta._j);
+            FieldIndex idx = fIdx + delta;
             
             if ((IsCorrectFieldIndex(idx)) && (Cells[idx._i, idx._j].IsAvailable))
                 adjCells.AddLast(Cells[idx._i, idx._j]);
@@ -211,18 +211,16 @@ public class CellsProcessor
     {
         LinkedList<Cell> availableCells = new LinkedList<Cell>();
     
-        int i = fIdx._i + idxDelta._i;
-        int j = fIdx._j + idxDelta._j;
+        FieldIndex idx = fIdx + idxDelta;
         
-        while (IsCorrectFieldIndex(i, j))
+        while (IsCorrectFieldIndex(idx))
         {
-            Cell c = Cells[i, j];
+            Cell c = Cells[idx._i, idx._j];
             if ((c != null) && c.IsAvailable && !c.IsEmpty)
                 availableCells.AddLast(c);
             else break;
-            
-            i += idxDelta._i;
-            j += idxDelta._j;
+
+            idx += idxDelta;
         }
         
         return availableCells;
@@ -236,7 +234,6 @@ public class CellsProcessor
     private LinkedList<Cell> GetHorizontalMatches(Cell cell, GameItemType gItemType)
     {
         LinkedList<Cell> horMatches = new LinkedList<Cell>();
-        // FillMatches(horMatches, GetAvailableHorizontalCells(cell.Index), gItemType);
         
         FillMatches(horMatches, GetAvailableCellsForDirection(cell.Index, new FieldIndex(0, -1)), gItemType);
         FillMatches(horMatches, GetAvailableCellsForDirection(cell.Index, new FieldIndex(0, 1)), gItemType);
@@ -250,7 +247,6 @@ public class CellsProcessor
     private LinkedList<Cell> GetVerticalMatches(Cell cell, GameItemType gItemType)
     {
         LinkedList<Cell> vertMatches = new LinkedList<Cell>();
-        // FillMatches(vertMatches, GetAvailableVerticalCells(cell.Index), gItemType);
         
         FillMatches(vertMatches, GetAvailableCellsForDirection(cell.Index, new FieldIndex(-1, 0)), gItemType);
         FillMatches(vertMatches, GetAvailableCellsForDirection(cell.Index, new FieldIndex(1, 0)), gItemType);
@@ -369,9 +365,6 @@ public class CellsProcessor
     {
         LinkedList<Cell> vertCells = GetAvailableVerticalCells(cell.Index);
         
-        // LinkedList<Cell> vertCells = GetAvailableCellsForDirection(cell.Index, new FieldIndex(-1, 0));
-        // vertCells.AppendRange(GetAvailableCellsForDirection(cell.Index, new FieldIndex(1, 0)));
-        
         foreach (Cell c in vertCells)
         {
             if (c.DetonationDelayFactor == 0)
@@ -387,9 +380,6 @@ public class CellsProcessor
 
     private IEnumerable<Cell> LaunchHorizontalBomb(Cell cell)
     {
-        // LinkedList<Cell> horCells = GetAvailableCellsForDirection(cell.Index, new FieldIndex(0, -1));
-        // horCells.AppendRange(GetAvailableCellsForDirection(cell.Index, new FieldIndex(0, 1)));
-        
         LinkedList<Cell> horCells = GetAvailableHorizontalCells(cell.Index);
         
         foreach (Cell c in horCells)
@@ -429,10 +419,5 @@ public class CellsProcessor
         GameItem tmpItem = Cells[idx1._i, idx1._j].GameItem;
         Cells[idx1._i, idx1._j].GameItem = Cells[idx2._i, idx2._j].GameItem;
         Cells[idx2._i, idx2._j].GameItem = tmpItem;
-    }
-
-    private bool IsCorrectFieldIndex(int i, int j)
-    {
-        return ((i >= 0) && (i < RowsNumber) && (j >= 0) && (j < ColumnsNumber));
     }
 }

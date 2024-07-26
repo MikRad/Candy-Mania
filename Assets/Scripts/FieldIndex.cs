@@ -12,6 +12,11 @@ public struct FieldIndex
         _j = j;
     }
 
+    public static FieldIndex operator +(FieldIndex a, FieldIndex b)
+    {
+        return new FieldIndex(a._i + b._i, a._j + b._j);
+    }
+
     public override string ToString()
     {
         return $"i = {_i} j = {_j}";
