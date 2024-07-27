@@ -45,4 +45,12 @@
             LevelNumber = levelNumber;
         }
     }
+    
+    public struct ButtonClicked :IEvent
+    {
+    }
+    
+    public struct ViewMoving :IEvent
+    {
+    }
 }

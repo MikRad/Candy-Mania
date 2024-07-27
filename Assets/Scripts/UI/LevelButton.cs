@@ -29,7 +29,7 @@ public class LevelButton : MonoBehaviour
             _button.image.sprite = _stateSprites[Available];
             _button.onClick.AddListener(() =>
             {
-                AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+                EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
                 onClickCallback(_levelNumber);
             });
         }

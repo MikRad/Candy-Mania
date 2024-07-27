@@ -18,7 +18,7 @@ public class LevelFailedPanel : UIView
     {
         SetActive(true);
         
-        AudioController.Instance.PlaySfx(SfxType.UIPanelSlide);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ViewMoving());
 
         _tweener.Show(StartScoreCountAnimation);
     }
@@ -39,7 +39,7 @@ public class LevelFailedPanel : UIView
 
     private void HandleRestartClick()
     {
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
 
         Hide();
     }
@@ -51,7 +51,7 @@ public class LevelFailedPanel : UIView
 
     private void StartScoreCountAnimation()
     {
-        AudioController.Instance.PlaySfx(SfxType.ScoreCount);
+        EventBus.Get.RaiseEvent(this, new ScoreCountingEvent());
 
         _levelScoreValueText.DoTextInt(0, _levelScore, _scoreCountDuration)
             .onComplete = () => {SetEnableElements(true);};

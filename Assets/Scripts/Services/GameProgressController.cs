@@ -49,8 +49,6 @@ public class GameProgressController
     {
         if(_scoresMap.TryGetValue(cell.CausedDetonationsNumber, out int score))
         {
-            AudioController.Instance.PlaySfx(SfxType.ScoreAdd);
-
             CurrentLevelScore += score;
             TotalScore += score;
             

@@ -55,15 +55,15 @@ public class MainMenu : MonoBehaviour
     
     private void HandlePlayButtonClicked()
     {
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
-
+        EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
+        
         _uiViewsController.HideUIView(UIViewType.MainMenuElements);
         _uiViewsController.ShowUIView(UIViewType.LevelButtonsPanel);
     }
 
     private void HandleSettingsButtonClicked()
     {
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
 
         _uiViewsController.HideUIView(UIViewType.MainMenuElements);
         _uiViewsController.ShowUIView(UIViewType.SettingsPanelMainMenu);
@@ -71,7 +71,7 @@ public class MainMenu : MonoBehaviour
 
     private void HandleExitButtonClicked()
     {
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
         
         _uiViewsController.HideUIView(UIViewType.MainMenuElements);
         

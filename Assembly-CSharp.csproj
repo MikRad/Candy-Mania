@@ -127,6 +127,7 @@
      <Compile Include="Assets\Scripts\Services\CameraHolder.cs" />
      <Compile Include="Assets\Scripts\Events\PossibleMovesChangedEvent.cs" />
      <Compile Include="Assets\Scripts\Events\GameItemDetonationStartedEvent.cs" />
+     <Compile Include="Assets\Scripts\Events\ScoreCountingEvent.cs" />
      <Folder Include="Assets" />
      <Folder Include="Assets\Scripts\Vfx" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

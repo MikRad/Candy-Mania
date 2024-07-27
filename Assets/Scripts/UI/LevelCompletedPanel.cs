@@ -20,8 +20,8 @@ public class LevelCompletedPanel : UIView
     public override void Show()
     {
         SetActive(true);
-        
-        AudioController.Instance.PlaySfx(SfxType.UIPanelSlide);
+
+        EventBus.Get.RaiseEvent(this, new UIEvents.ViewMoving());
 
         _tweener.Show(StartScoreCountAnimation);
     }
@@ -42,7 +42,7 @@ public class LevelCompletedPanel : UIView
 
     private void HandleContinueClick()
     {
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
 
         Hide();
     }
@@ -54,7 +54,7 @@ public class LevelCompletedPanel : UIView
 
     private void StartScoreCountAnimation()
     {
-        AudioController.Instance.PlaySfx(SfxType.ScoreCount);
+        EventBus.Get.RaiseEvent(this, new ScoreCountingEvent());
 
         _levelScoreValueText.DoTextInt(0, _levelScore, _scoreCountDuration);
         _totalScoreValueText.DoTextInt((_totalScore - _levelScore), _totalScore, _scoreCountDuration)

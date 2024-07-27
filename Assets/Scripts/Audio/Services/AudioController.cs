@@ -40,11 +40,14 @@ public class AudioController : SingletonMonoBehaviour<AudioController>
         _musicTrackSource.volume = _musicVolume;
         _musicTrackSource.loop = false;
 
+        AddEventHandlers();
         // PlayRandomTrack();
     }
 
     private void OnDestroy()
     {
+        RemoveEventHandlers();
+        
         SaveAudioParams();
     }
 
@@ -56,7 +59,31 @@ public class AudioController : SingletonMonoBehaviour<AudioController>
         PlayNextTrack();
     }*/
 
-    public void PlaySfx(SfxType sfxType, Transform targetTransform = null)
+    private void AddEventHandlers()
+    {
+        EventBus.Get.Subscribe<GameItemDetonationStartedEvent>(HandleGameItemDetonation);
+        EventBus.Get.Subscribe<LevelCompletedEvent>(HandleLevelCompleted);
+        EventBus.Get.Subscribe<LevelFailedEvent>(HandleLevelFailed);
+        EventBus.Get.Subscribe<LevelTimeExpiringEvent>(HandleLevelTimeExpiring);
+        EventBus.Get.Subscribe<ScoreCountingEvent>(HandleScoreCounting);
+        EventBus.Get.Subscribe<ScoreChangedEvent>(HandleScoreChanged);
+        EventBus.Get.Subscribe<UIEvents.ButtonClicked>(HandleUIButtonClicked);
+        EventBus.Get.Subscribe<UIEvents.ViewMoving>(HandleUIViewMoving);
+    }
+
+    private void RemoveEventHandlers()
+    {
+        EventBus.Get.Unsubscribe<GameItemDetonationStartedEvent>(HandleGameItemDetonation);
+        EventBus.Get.Unsubscribe<LevelCompletedEvent>(HandleLevelCompleted);
+        EventBus.Get.Unsubscribe<LevelFailedEvent>(HandleLevelFailed);
+        EventBus.Get.Unsubscribe<LevelTimeExpiringEvent>(HandleLevelTimeExpiring);
+        EventBus.Get.Unsubscribe<ScoreCountingEvent>(HandleScoreCounting);
+        EventBus.Get.Unsubscribe<ScoreChangedEvent>(HandleScoreChanged);
+        EventBus.Get.Subscribe<UIEvents.ButtonClicked>(HandleUIButtonClicked);
+        EventBus.Get.Subscribe<UIEvents.ViewMoving>(HandleUIViewMoving);
+    }
+
+    private void PlaySfx(SfxType sfxType, Transform targetTransform = null)
     {
         if ((targetTransform != null) && (!targetTransform.gameObject.activeSelf))
         {
@@ -118,5 +145,54 @@ public class AudioController : SingletonMonoBehaviour<AudioController>
     {
         PlayerPrefs.SetFloat(MusicVolumeKey, _musicVolume);
         PlayerPrefs.SetFloat(SfxVolumeKey, _sfxVolume);
+    }
+    
+    private void HandleGameItemDetonation(GameItemDetonationStartedEvent ev)
+    {
+        GameItem item = ev.Item;
+        
+        if (item.IsUsual())
+        {
+            PlaySfx(SfxType.ItemDetonation);
+        }
+        else
+        {
+            PlaySfx(item.IsStar() ? SfxType.StarDetonation : SfxType.BombDetonation);
+        }
+    }
+    
+    private void HandleLevelCompleted()
+    {
+        PlaySfx(SfxType.LevelCompleted);
+    }
+    
+    private void HandleLevelFailed()
+    {
+        PlaySfx(SfxType.LevelFailed);
+    }
+    
+    private void HandleLevelTimeExpiring()
+    {
+        PlaySfx(SfxType.TimeTick);
+    }
+    
+    private void HandleUIButtonClicked()
+    {
+        PlaySfx(SfxType.ButtonClick);
+    }
+    
+    private void HandleUIViewMoving()
+    {
+        PlaySfx(SfxType.UIPanelSlide);
+    }
+    
+    private void HandleScoreCounting()
+    {
+        PlaySfx(SfxType.ScoreCount);
+    }
+    
+    private void HandleScoreChanged(ScoreChangedEvent ev)
+    {
+        PlaySfx(SfxType.ScoreAdd);
     }
 }

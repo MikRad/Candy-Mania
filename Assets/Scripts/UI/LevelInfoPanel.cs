@@ -140,8 +140,7 @@ public class LevelInfoPanel : UIView
         if (Game.Instance.IsPaused || Game.Instance.IsLevelFinished)
             return;
 
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
-
+        EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
         EventBus.Get.RaiseEvent(this, new UIEvents.LevelInfoPanelSettingsClicked());
     }
 }

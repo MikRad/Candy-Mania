@@ -95,21 +95,21 @@ public class GameItem : MonoBehaviour
     {
         EventBus.Get.RaiseEvent(this, new GameItemDetonationStartedEvent(this));
         
-        if (this.IsUsual())
-        {
-            AudioController.Instance.PlaySfx(SfxType.ItemDetonation);
-        }
-        else
-        {
-            if(this.IsStar())
-            {
-                AudioController.Instance.PlaySfx(SfxType.StarDetonation);
-            }
-            else
-            {
-                AudioController.Instance.PlaySfx(SfxType.BombDetonation);
-            }
-        }
+        // if (this.IsUsual())
+        // {
+        //     AudioController.Instance.PlaySfx(SfxType.ItemDetonation);
+        // }
+        // else
+        // {
+        //     if(this.IsStar())
+        //     {
+        //         AudioController.Instance.PlaySfx(SfxType.StarDetonation);
+        //     }
+        //     else
+        //     {
+        //         AudioController.Instance.PlaySfx(SfxType.BombDetonation);
+        //     }
+        // }
     }
 
     private void InitBaseType()

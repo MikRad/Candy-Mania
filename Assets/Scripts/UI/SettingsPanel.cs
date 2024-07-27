@@ -38,7 +38,7 @@ public class SettingsPanel : UIView
 
     private void ContinueClickHandler()
     {
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
 
         Hide();
 
@@ -47,7 +47,7 @@ public class SettingsPanel : UIView
 
     private void MainMenuClickHandler()
     {
-        AudioController.Instance.PlaySfx(SfxType.ButtonClick);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ButtonClicked());
 
         Hide();
         

@@ -380,20 +380,16 @@ public class LevelController : MonoBehaviour
         
         if (_levelResult == LevelResult.AllConditionsReached)
         {
-            AudioController.Instance.PlaySfx(SfxType.LevelCompleted);
-
             SetState(LevelState.Finalisation);
             
             EventBus.Get.RaiseEvent(this, new LevelCompletedEvent(_gameProgressController.CurrentLevelScore, 
                 _gameProgressController.TotalScore, _maxComboCount, _levelTimer.TimePlayed));
             return;
         }
-        
-        AudioController.Instance.PlaySfx(SfxType.LevelFailed);
             
-        SetState(LevelState.Finalisation);
-        
         EventBus.Get.RaiseEvent(this, new LevelFailedEvent(_gameProgressController.CurrentLevelScore, _levelTimer.TimePlayed));
+        
+        SetState(LevelState.Finalisation);
     }
 
     private void InitConditions(LevelData levelData)
@@ -448,16 +444,6 @@ public class LevelController : MonoBehaviour
         EventBus.Get.RaiseEvent(this, new PossibleMovesChangedEvent(_possibleSuccessfulMoves.Count / 2));
     }
     
-    private void HandleTimeExpiring()
-    {
-        AudioController.Instance.PlaySfx(SfxType.TimeTick);
-
-        // VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
-        //     .SetText($"{LevelMessages.TimeExpiring}", FlyingMessage.MessageType.Warning);
-        
-        // _uiViewsController.SetLevelInfoTimeAlarm();
-    }
-
     private void HandleTimeExpired()
     {
         _levelResult = LevelResult.TimeExpired;
@@ -475,7 +461,6 @@ public class LevelController : MonoBehaviour
     
     private void AddEventHandlers()
     {
-        EventBus.Get.Subscribe<LevelTimeExpiringEvent>(HandleTimeExpiring);
         EventBus.Get.Subscribe<LevelTimeExpiredEvent>(HandleTimeExpired);
         EventBus.Get.Subscribe<AllLevelPassConditionsReachedEvent>(HandleAllLevelPassConditionsReached);
         EventBus.Get.Subscribe<NoMoreMovesEvent>(HandleNoMoreMoves);
@@ -488,7 +473,6 @@ public class LevelController : MonoBehaviour
 
     private void RemoveEventHandlers()
     {
-        EventBus.Get.Unsubscribe<LevelTimeExpiringEvent>(HandleTimeExpiring);
         EventBus.Get.Unsubscribe<LevelTimeExpiredEvent>(HandleTimeExpired);
         EventBus.Get.Unsubscribe<AllLevelPassConditionsReachedEvent>(HandleAllLevelPassConditionsReached);
         EventBus.Get.Unsubscribe<NoMoreMovesEvent>(HandleNoMoreMoves);

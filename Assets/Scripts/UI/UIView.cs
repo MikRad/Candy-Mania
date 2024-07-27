@@ -5,8 +5,6 @@ public abstract class UIView : MonoBehaviour
 {
     protected UITweener _tweener;
     
-    // public event Action<UIEventType, object> OnUserEvent;
-
     protected virtual void Start()
     {
         _tweener = GetComponent<UITweener>();
@@ -25,14 +23,14 @@ public abstract class UIView : MonoBehaviour
     {
         SetActive(true);
         
-        AudioController.Instance.PlaySfx(SfxType.UIPanelSlide);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ViewMoving());
 
         _tweener.Show((() => SetEnableElements(true)));
     }
 
     public virtual void Hide()
     {
-        AudioController.Instance.PlaySfx(SfxType.UIPanelSlide);
+        EventBus.Get.RaiseEvent(this, new UIEvents.ViewMoving());
 
         SetEnableElements(false);
         
