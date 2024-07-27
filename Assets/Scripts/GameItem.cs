@@ -1,7 +1,7 @@
-using DG.Tweening;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(GameItemAnimator))]
 [RequireComponent(typeof(SpriteRenderer))]
 public class GameItem : MonoBehaviour
 {
@@ -10,35 +10,13 @@ public class GameItem : MonoBehaviour
 
     [Header("View settings")]
     [SerializeField] private Sprite[] _sprites;
-    [SerializeField] private Vector3 _normalScale = new Vector3(1f, 1f, 1f);
-    [SerializeField] private Vector3 _selectedScale = new Vector3(1.15f, 1.15f, 1f);
-
-    [Header("Movement settings")]
-    [SerializeField] private float _swapDuration = 0.25f;
-    [SerializeField] private Ease _swapEase = Ease.Linear;
-    [SerializeField] private float _fallDuration = 0.25f;
-    [SerializeField] private float _startFallDuration = 0.75f;
-    [SerializeField] private float _fallDelayStep = 0.05f;
-    [SerializeField] private Ease _fallEase = Ease.Linear;
-
-    [Header("Detonation settings")]
-    [SerializeField] private float _detonationDuration = 0.5f;
-    [SerializeField] private Ease _detonationEase = Ease.Linear;
-
-    [Header("Hint settings")]
-    [SerializeField] private float _hintJumpDuration = 0.15f;
-    [SerializeField] private float _hintJumpDelta = 0.25f;
-    [SerializeField] private float _hintJumpInterval = 0.25f;
-    [SerializeField] private float _hintFallDuration = 0.25f;
-    [SerializeField] private Ease _hintJumpEase = Ease.OutCubic;
-    [SerializeField] private Ease _hintFallEase = Ease.OutCubic;
 
     private SpriteRenderer _spriteRenderer;
+    private GameItemAnimator _animator;
 
-    private Color _normalColor;
+    private Color _originalColor;
     
     private int _defaultSortingOrder;
-    private Sequence _hintAnimationSequence;
 
     public GameItemType ItemType => _itemType;
     public GameItemType BaseItemType { get; private set; }
@@ -48,22 +26,19 @@ public class GameItem : MonoBehaviour
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _animator = GetComponent<GameItemAnimator>();
+        
         CachedTransform = transform;
         _defaultSortingOrder = _spriteRenderer.sortingOrder;
-        _normalColor = _spriteRenderer.color;
+        _originalColor = _spriteRenderer.color;
 
         InitBaseType();
         InitView();
     }
 
-    private void OnDestroy()
-    {
-        _hintAnimationSequence?.Kill();
-    }
-
     public void Init()
     {
-        _spriteRenderer.color = _normalColor;
+        _spriteRenderer.color = _originalColor;
     }
     
     public void Remove()
@@ -73,8 +48,7 @@ public class GameItem : MonoBehaviour
     
     public void SetSelected(bool isSelected)
     {
-        VfxController.Instance.AddItemSelectionVfx()
-            .SetTarget(CachedTransform, isSelected ? _selectedScale : _normalScale);
+        _animator.AnimateSelection(isSelected);
     }
 
     public void SetHinted(bool isHinted, float hintDelay = 0f)
@@ -82,46 +56,23 @@ public class GameItem : MonoBehaviour
         if (isHinted)
         {
             _spriteRenderer.sortingOrder = _defaultSortingOrder + 1;
-            
-            Vector3 currentPos = CachedTransform.position;
-            _hintAnimationSequence = DOTween.Sequence()
-                .AppendInterval(hintDelay)
-                .Append(CachedTransform.DOLocalMoveY(currentPos.y + _hintJumpDelta, _hintJumpDuration).SetEase(_hintJumpEase))
-                .Append(CachedTransform.DOLocalMoveY(currentPos.y, _hintFallDuration).SetEase(_hintFallEase))
-                .AppendInterval(_hintJumpInterval)
-                .Append(CachedTransform.DOLocalMoveY(currentPos.y + _hintJumpDelta, _hintJumpDuration).SetEase(_hintJumpEase))
-                .Append(CachedTransform.DOLocalMoveY(currentPos.y, _hintFallDuration).SetEase(_hintFallEase))
-                .AppendCallback(HandleHintCompleted);
+            _animator.AnimateHint(hintDelay, HandleHintCompleted);
         }
         else
         {
-            _hintAnimationSequence?.Kill(true);
+            _animator.TerminateHintAnimation();
             _spriteRenderer.sortingOrder = _defaultSortingOrder;
         }
     }
 
     public void FallTo(Vector2 destinationPos, float fallDelayFactor = 0, bool isStartFall = false)
     {
-        float duration = isStartFall ? _startFallDuration : _fallDuration;
-        DOTween.Sequence()
-            .AppendInterval(_fallDelayStep * fallDelayFactor)
-            .Append(CachedTransform.DOLocalMove(destinationPos, duration).SetEase(_fallEase))
-            .AppendCallback(HandleFallCompleted);
+        _animator.AnimateFall(destinationPos, fallDelayFactor, isStartFall, HandleFallCompleted);
     }
 
-    public void SwapTo(Vector2 destinationPos)
+    public void SwapTo(Vector2 destinationPos, bool isSuccessfulMove)
     {
-        DOTween.Sequence()
-            .Append(CachedTransform.DOLocalMove(destinationPos, _swapDuration).SetEase(_swapEase))
-            .AppendCallback(HandleSwapCompleted);
-    }
-
-    public void SwapToAndReturn(Vector2 destinationPos)
-    {
-        DOTween.Sequence()
-            .Append(CachedTransform.DOLocalMove(destinationPos, _swapDuration).SetEase(_swapEase))
-            .Append(CachedTransform.DOLocalMove(CachedTransform.position, _swapDuration).SetEase(_swapEase))
-            .AppendCallback(HandleSwapCompleted);
+        _animator.AnimateSwap(destinationPos, isSuccessfulMove, HandleSwapCompleted);
     }
 
     // for use in LevelEditor
@@ -135,14 +86,12 @@ public class GameItem : MonoBehaviour
     
     public void Detonate()
     {
-        PlayDetonationFx();
+        AddDetonationFx();
 
-        DOTween.Sequence()
-            .Append(_spriteRenderer.DOFade(0f, _detonationDuration).SetEase(_detonationEase))
-            .AppendCallback(HandleDetonationCompleted);
+        _animator.AnimateDetonation(HandleDetonationCompleted);
     }
 
-    private void PlayDetonationFx()
+    private void AddDetonationFx()
     {
         Vector3 position = CachedTransform.position;
         
@@ -181,8 +130,6 @@ public class GameItem : MonoBehaviour
         }
 
         _spriteRenderer.sprite = _sprites[spriteIndex];
-
-        CachedTransform.localScale = _normalScale;
     }
     
     private void HandleSwapCompleted()
@@ -192,7 +139,7 @@ public class GameItem : MonoBehaviour
 
     private void HandleFallCompleted()
     {
-        VfxController.Instance.AddFallenItemVfx().SetTarget(CachedTransform);
+        _animator.AnimateFallenVfx();
         
         EventBus.Get.RaiseEvent(this, new GameItemFallCompletedEvent(this));
     }
@@ -202,7 +149,6 @@ public class GameItem : MonoBehaviour
         _spriteRenderer.sortingOrder = _defaultSortingOrder;
         
         EventBus.Get.RaiseEvent(this, new GameItemHintCompletedEvent(this));
-        // OnHintCompleted?.Invoke(this);
     }
 
     private void HandleDetonationCompleted()

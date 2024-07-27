@@ -41,9 +41,7 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Vfx\FallenItemVfx.cs" />
      <Compile Include="Assets\Scripts\Extensions\TextMeshTweenExtension.cs" />
-     <Compile Include="Assets\Scripts\Vfx\ItemSelectionVfx.cs" />
      <Compile Include="Assets\Scripts\Vfx\VfxDestroyChecker.cs" />
      <Compile Include="Assets\Scripts\UI\LevelCompletedPanel.cs" />
      <Compile Include="Assets\Scripts\Services\GameItemSpawner.cs" />
@@ -118,6 +116,7 @@
      <Compile Include="Assets\JMO Assets\Cartoon FX\Scripts\CFX_AutoDestructShuriken.cs" />
      <Compile Include="Assets\Scripts\Events\EventBinding.cs" />
      <Compile Include="Assets\Scripts\Utils\Pool.cs" />
+     <Compile Include="Assets\Scripts\GameItemAnimator.cs" />
      <Compile Include="Assets\Scripts\Events\Services\EventBus.cs" />
      <Compile Include="Assets\Scripts\Events\IEvent.cs" />
      <Compile Include="Assets\Scripts\Audio\GameAudioSource.cs" />

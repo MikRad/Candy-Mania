@@ -48,8 +48,8 @@ public class CellsProcessor
 
         if (!isSuccessfulMove)
         {
-            cPair.FirstCell.GameItem.SwapToAndReturn(cPair.SecondCell.GameItem.CachedTransform.localPosition);
-            cPair.SecondCell.GameItem.SwapToAndReturn(cPair.FirstCell.GameItem.CachedTransform.localPosition);
+            cPair.FirstCell.GameItem.SwapTo(cPair.SecondCell.GameItem.CachedTransform.localPosition, isSuccessfulMove);
+            cPair.SecondCell.GameItem.SwapTo(cPair.FirstCell.GameItem.CachedTransform.localPosition, isSuccessfulMove);
             SwapItems(cPair);
             
             return new LinkedList<Cell>();
@@ -67,8 +67,8 @@ public class CellsProcessor
             AddMatchesToList(matchedCells, matches2, cPair.SecondCell);
             CheckCellItemForUpgrade(cPair.SecondCell, matches2.Count);
         }
-        cPair.FirstCell.GameItem.SwapTo(cPair.SecondCell.GameItem.CachedTransform.localPosition);
-        cPair.SecondCell.GameItem.SwapTo(cPair.FirstCell.GameItem.CachedTransform.localPosition);
+        cPair.FirstCell.GameItem.SwapTo(cPair.SecondCell.GameItem.CachedTransform.localPosition, true);
+        cPair.SecondCell.GameItem.SwapTo(cPair.FirstCell.GameItem.CachedTransform.localPosition, true);
 
         CheckCellsForExplosiveItems(matchedCells);
 

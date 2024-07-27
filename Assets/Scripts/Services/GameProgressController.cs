@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -55,10 +54,7 @@ public class GameProgressController
             CurrentLevelScore += score;
             TotalScore += score;
             
-            EventBus.Get.RaiseEvent(this, new ScoreChangedEvent(CurrentLevelScore, TotalScore));
-            
-            VfxController.Instance.AddFlyingScoreVfx(cell.CachedTransform.position, Quaternion.identity) 
-                .SetText($"+{score}", FlyingMessage.MessageType.Positive);
+            EventBus.Get.RaiseEvent(this, new ScoreChangedEvent(score, TotalScore, cell));
         }
     }
     

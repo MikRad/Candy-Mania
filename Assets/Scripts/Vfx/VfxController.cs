@@ -11,12 +11,9 @@ public class VfxController : MonoBehaviour
     [SerializeField] private VfxBase[] _itemDetonationvfxPrefabs;
     [SerializeField] private VfxBase[] _otherVfxPrefabs;
     
-    [SerializeField] private VfxBase _fallenItemVfxPrefab;
-    
     [Header("Vfx pools size")] 
     [SerializeField] private int _defaultVfxPoolSize = 10;
     [SerializeField] private int _itemDetonationVfxPoolSize = 20;
-    [SerializeField] private int _fallenItemsPoolSize = 100;
 
     public static VfxController Instance { get; private set; }
 
@@ -33,55 +30,50 @@ public class VfxController : MonoBehaviour
         Instance = this;
 
         FillVfxPoolsMap();
+
+        AddEventHandlers();
     }
 
     private void OnDestroy()
     {
         if (Instance == this)
         {
+            RemoveEventHandlers();
             Instance = null;
         }
     }
 
+    private void AddEventHandlers()
+    {
+        EventBus.Get.Subscribe<ScoreChangedEvent>(HandleScoreChanged);
+    }
+
+    private void RemoveEventHandlers()
+    {
+        EventBus.Get.Unsubscribe<ScoreChangedEvent>(HandleScoreChanged);
+    }
+    
+    private void HandleScoreChanged(ScoreChangedEvent ev)
+    {
+        FlyingMessage vfx = GetVfx(VfxType.FlyingScore) as FlyingMessage;
+        if (vfx != null)
+        {
+            FlyingMessage.MessageType msgType = (ev.ScoreDelta > 0)
+                ? FlyingMessage.MessageType.Positive
+                : FlyingMessage.MessageType.Negative;
+            string msgPrefix = (ev.ScoreDelta > 0) ? "+" : "-";
+            
+            vfx.Init(ev.SourceCell.CachedTransform.position, Quaternion.identity);
+            vfx.SetText($"{msgPrefix}{ev.ScoreDelta}", msgType);
+        }
+    }
+    
     public ScalerVfx AddScalerVfx(VfxType type)
     {
         ScalerVfx vfx = GetVfx(type) as ScalerVfx;
         if (vfx != null)
         {
             vfx.Init(Vector3.zero, Quaternion.identity);
-        }
-        
-        return vfx;
-    }
-    
-    public ItemSelectionVfx AddItemSelectionVfx()
-    {
-        ItemSelectionVfx vfx = GetVfx(VfxType.ItemSelection) as ItemSelectionVfx;
-        if (vfx != null)
-        {
-            vfx.Init(Vector3.zero, Quaternion.identity);
-        }
-        
-        return vfx;
-    }
-    
-    public FallenItemVfx AddFallenItemVfx()
-    {
-        FallenItemVfx vfx = GetVfx(VfxType.FallenItem) as FallenItemVfx;
-        if (vfx != null)
-        {
-            vfx.Init(Vector3.zero, Quaternion.identity);
-        }
-        
-        return vfx;
-    }
-    
-    public FlyingMessage AddFlyingScoreVfx(Vector3 position, Quaternion rotation)
-    {
-        FlyingMessage vfx = GetVfx(VfxType.FlyingScore) as FlyingMessage;
-        if (vfx != null)
-        {
-            vfx.Init(position, rotation);
         }
         
         return vfx;
@@ -155,7 +147,5 @@ public class VfxController : MonoBehaviour
             if (!_vfxPoolsMap.ContainsKey(vfx.Type))
                 _vfxPoolsMap.Add(vfx.Type, new Pool<VfxBase>(vfx, _defaultVfxPoolSize, _vfxContainer));
         }
-        
-        _vfxPoolsMap.Add(_fallenItemVfxPrefab.Type, new Pool<VfxBase>(_fallenItemVfxPrefab, _fallenItemsPoolSize, _vfxContainer));
     }
 }
