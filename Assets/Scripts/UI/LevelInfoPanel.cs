@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,10 @@ public class LevelInfoPanel : UIView
     [SerializeField] private HorizontalLayoutGroup _lpcViewsContainerLayout;
     [SerializeField] private LevelPassConditionView _lpcViewPrefab;
     [SerializeField] private int __lpcViewsContainerPadding = 120;
+    
+    [Header("UI animation")]
+    [SerializeField] private float _timeAlarmAnimationDuration = 0.3f;
+    [SerializeField] private Vector3 _timeAlarmAnimationScale = new Vector3(1.1f, 1.1f, 1f);
     
     private readonly Dictionary<LevelPassCondition.Type, LevelPassConditionView> _lpcViewsMap = new Dictionary<LevelPassCondition.Type, LevelPassConditionView>();
 
@@ -112,8 +117,9 @@ public class LevelInfoPanel : UIView
     {
         _timeText.color = _timeTextAlarmColor;
 
-        VfxController.Instance.AddScalerVfx(VfxType.Scaler)
-            .SetTarget(_timeTextTransform);
+        _timeTextTransform.DOScale(_timeAlarmAnimationScale, _timeAlarmAnimationDuration)
+            .SetLoops(2, LoopType.Yoyo)
+            .SetEase(Ease.InOutSine);
     }
     
     private void HandleLevelPassConditionUpdated(LevelPassConditionUpdatedEvent ev)

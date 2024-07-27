@@ -85,8 +85,11 @@ public class LevelController : MonoBehaviour
         _levelTimer = new LevelTimer(settings._levelTimeAlarm);
         
         _gameItemSpawner.Init(_cellsProcessor);
+        _gameFieldCenter = GetPositionFromFieldIndex(new FieldIndex(_maxRowsNumber / 2, _maxColumnsNumber / 2));
+        
+        VfxController.Instance.Init(_gameFieldCenter);
 
-        DOTween.SetTweensCapacity(100, 100);
+        DOTween.SetTweensCapacity(200, 100);
         
         AddEventHandlers();
     }
@@ -295,9 +298,7 @@ public class LevelController : MonoBehaviour
             else
             {
                 _currentComboCount++;
-
-                VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
-                    .SetText($"{LevelMessages.Combo} {_currentComboCount} X", FlyingMessage.MessageType.Positive);
+                EventBus.Get.RaiseEvent(this, new ComboCollectedEvent(_currentComboCount));
 
                 if (_currentComboCount > _maxComboCount)
                     _maxComboCount = _currentComboCount;
@@ -370,10 +371,6 @@ public class LevelController : MonoBehaviour
                 }
             }
         }
-
-        int centerIdxI = _maxRowsNumber / 2;
-        int centerIdxJ = _maxColumnsNumber / 2;
-        _gameFieldCenter = _cells[centerIdxI, centerIdxJ].CachedTransform.position;
     }
 
     private void CheckLevelResult()
@@ -384,8 +381,6 @@ public class LevelController : MonoBehaviour
         if (_levelResult == LevelResult.AllConditionsReached)
         {
             AudioController.Instance.PlaySfx(SfxType.LevelCompleted);
-            VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
-                .SetText($"{LevelMessages.LevelCompleted}", FlyingMessage.MessageType.Positive);
 
             SetState(LevelState.Finalisation);
             
@@ -394,17 +389,6 @@ public class LevelController : MonoBehaviour
             return;
         }
         
-        if (_levelResult == LevelResult.TimeExpired)
-        {
-            VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
-                .SetText($"{LevelMessages.TimeExpired}", FlyingMessage.MessageType.Negative);
-        }
-        else if (_levelResult == LevelResult.NoMoreMoves)
-        {
-            VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
-                .SetText($"{LevelMessages.NoMoves}", FlyingMessage.MessageType.Negative);
-        }
-            
         AudioController.Instance.PlaySfx(SfxType.LevelFailed);
             
         SetState(LevelState.Finalisation);
@@ -468,8 +452,8 @@ public class LevelController : MonoBehaviour
     {
         AudioController.Instance.PlaySfx(SfxType.TimeTick);
 
-        VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
-            .SetText($"{LevelMessages.TimeExpiring}", FlyingMessage.MessageType.Warning);
+        // VfxController.Instance.AddFlyingMessageVfx(_gameFieldCenter, Quaternion.identity) 
+        //     .SetText($"{LevelMessages.TimeExpiring}", FlyingMessage.MessageType.Warning);
         
         // _uiViewsController.SetLevelInfoTimeAlarm();
     }

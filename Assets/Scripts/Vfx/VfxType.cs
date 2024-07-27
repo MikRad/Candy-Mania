@@ -11,8 +11,4 @@
     FlyingStar = 8,
     FlyingMessage = 9,
     FlyingScore = 10,
-    Scaler = 11,
-    ScalerLPCView = 12,
-    ItemSelection = 13,
-    FallenItem = 14,
 }

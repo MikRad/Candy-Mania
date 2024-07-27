@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,16 +8,18 @@ public class LevelPassConditionView : MonoBehaviour
 {
     [SerializeField] private Image _lpcImage;
     [SerializeField] private TextMeshProUGUI _lpcNumberNeededToCompleteText;
-
     [SerializeField] private LPCSpriteInfo[] _lpcSpriteInfos;
 
-    private bool _isVfxPerforming;
+    [Header("Animation")]
+    [SerializeField] private float _updateAnimationDuration = 0.2f;
+    [SerializeField] private Vector3 _updateAnimationScale = new Vector3(1.1f, 1.1f, 1f);
 
-    private Transform _cachedTransform;
+    private Tween _updateAnimation;
+    private Transform _imageTransform;
 
     private void Awake()
     {
-        _cachedTransform = transform;
+        _imageTransform = _lpcImage.transform;
     }
 
     public void InitView(LevelPassCondition.Type lpcType, int numberNeeded)
@@ -27,16 +30,14 @@ public class LevelPassConditionView : MonoBehaviour
 
     public void UpdateView(int numberNeeded)
     {
-        if(!_isVfxPerforming)
-        {
-            _isVfxPerforming = true;
-
-            VfxController.Instance.AddScalerVfx(VfxType.ScalerLPCView)
-                .SetTarget(_cachedTransform)
-                .OnCompleted(HandleVfxCompleted);
-        }
-
         _lpcNumberNeededToCompleteText.text = numberNeeded.ToString();
+
+        if (_updateAnimation != null && _updateAnimation.IsActive())
+            return;
+        
+        _updateAnimation = _imageTransform.DOScale(_updateAnimationScale, _updateAnimationDuration)
+            .SetLoops(4, LoopType.Yoyo)
+            .SetEase(Ease.InOutSine);
     }
 
     private Sprite GetSpriteByType(LevelPassCondition.Type lpcType)
@@ -48,11 +49,6 @@ public class LevelPassConditionView : MonoBehaviour
         }
 
         return null;
-    }
-    
-    private void HandleVfxCompleted()
-    {
-        _isVfxPerforming = false;
     }
     
     [Serializable]

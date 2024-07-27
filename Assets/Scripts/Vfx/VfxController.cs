@@ -15,9 +15,11 @@ public class VfxController : MonoBehaviour
     [SerializeField] private int _defaultVfxPoolSize = 10;
     [SerializeField] private int _itemDetonationVfxPoolSize = 20;
 
-    public static VfxController Instance { get; private set; }
-
     private readonly Dictionary<VfxType, Pool<VfxBase>> _vfxPoolsMap = new Dictionary<VfxType, Pool<VfxBase>>();
+
+    private Vector2 _gameFieldCenterPosition;
+    
+    public static VfxController Instance { get; private set; }
     
     private void Awake()
     {
@@ -43,14 +45,31 @@ public class VfxController : MonoBehaviour
         }
     }
 
+    public void Init(Vector2 gameFieldCenterPos)
+    {
+        _gameFieldCenterPosition = gameFieldCenterPos;
+    }
+    
     private void AddEventHandlers()
     {
         EventBus.Get.Subscribe<ScoreChangedEvent>(HandleScoreChanged);
+        EventBus.Get.Subscribe<LevelCompletedEvent>(HandleLevelCompleted);
+        EventBus.Get.Subscribe<ComboCollectedEvent>(HandleComboCollected);
+        EventBus.Get.Subscribe<LevelTimeExpiringEvent>(HandleLevelTimeExpiring);
+        EventBus.Get.Subscribe<LevelTimeExpiredEvent>(HandleLevelTimeExpired);
+        EventBus.Get.Subscribe<NoMoreMovesEvent>(HandleNoMoreMoves);
+        EventBus.Get.Subscribe<GameItemDetonationStartedEvent>(HandleGameItemDetonation);
     }
 
     private void RemoveEventHandlers()
     {
         EventBus.Get.Unsubscribe<ScoreChangedEvent>(HandleScoreChanged);
+        EventBus.Get.Unsubscribe<LevelCompletedEvent>(HandleLevelCompleted);
+        EventBus.Get.Unsubscribe<ComboCollectedEvent>(HandleComboCollected);
+        EventBus.Get.Unsubscribe<LevelTimeExpiringEvent>(HandleLevelTimeExpiring);
+        EventBus.Get.Unsubscribe<LevelTimeExpiredEvent>(HandleLevelTimeExpired);
+        EventBus.Get.Unsubscribe<NoMoreMovesEvent>(HandleNoMoreMoves);
+        EventBus.Get.Unsubscribe<GameItemDetonationStartedEvent>(HandleGameItemDetonation);
     }
     
     private void HandleScoreChanged(ScoreChangedEvent ev)
@@ -68,44 +87,90 @@ public class VfxController : MonoBehaviour
         }
     }
     
-    public ScalerVfx AddScalerVfx(VfxType type)
+    private void HandleLevelCompleted()
     {
-        ScalerVfx vfx = GetVfx(type) as ScalerVfx;
-        if (vfx != null)
+        FlyingMessage message = GetMessageVfx();
+        if (message != null)
         {
-            vfx.Init(Vector3.zero, Quaternion.identity);
+            message.SetText($"{LevelMessages.LevelCompleted}", FlyingMessage.MessageType.Positive);
         }
-        
-        return vfx;
     }
     
-    public FlyingMessage AddFlyingMessageVfx(Vector3 position, Quaternion rotation)
+    private void HandleComboCollected(ComboCollectedEvent ev)
     {
-        FlyingMessage vfx = GetVfx(VfxType.FlyingMessage) as FlyingMessage;
-        if (vfx != null)
+        FlyingMessage message = GetMessageVfx();
+        if (message != null)
         {
-            vfx.Init(position, rotation);
+            message.SetText($"{LevelMessages.Combo} {ev.ComboCount} x", FlyingMessage.MessageType.Positive);
         }
-        
-        return vfx;
     }
     
-    public void AddBombDetonationVfx(Vector2 position)
+    private void HandleLevelTimeExpiring()
+    {
+        FlyingMessage message = GetMessageVfx();
+        if (message != null)
+        {
+            message.SetText($"{LevelMessages.TimeExpiring}", FlyingMessage.MessageType.Warning);
+        }
+    }
+
+    private void HandleLevelTimeExpired()
+    {
+        FlyingMessage message = GetMessageVfx();
+        if (message != null)
+        {
+            message.SetText($"{LevelMessages.TimeExpired}", FlyingMessage.MessageType.Negative);
+        }
+    }
+    
+    private void HandleNoMoreMoves()
+    {
+        FlyingMessage message = GetMessageVfx();
+        if (message != null)
+        {
+            message.SetText($"{LevelMessages.NoMoreMoves}", FlyingMessage.MessageType.Negative);
+        }
+    }
+
+    private void HandleGameItemDetonation(GameItemDetonationStartedEvent ev)
+    {
+        GameItem item = ev.Item;
+        Vector3 position = item.CachedTransform.position;
+
+        if (item.IsUsual())
+        {
+            AddGameItemDetonationVfx(item.BaseItemType, position);
+        }
+        else
+        {
+            if (item.IsStar())
+            {
+                AddStarCollectVfx(position);
+                AddFlyingStarVfx(position);
+            }
+            else
+            {
+                AddBombDetonationVfx(position);
+            }
+        }
+    }
+    
+    private void AddBombDetonationVfx(Vector2 position)
     {
         GetVfx(VfxType.BombDetonation).Init(position, Quaternion.identity);
     }
-    
-    public void AddStarCollectVfx(Vector2 position)
+
+    private void AddStarCollectVfx(Vector2 position)
     {
         GetVfx(VfxType.StarCollect).Init(position, Quaternion.identity);
     }
-    
-    public void AddFlyingStarVfx(Vector2 position)
+
+    private void AddFlyingStarVfx(Vector2 position)
     {
         GetVfx(VfxType.FlyingStar).Init(position, Quaternion.identity);
     }
 
-    public void AddGameItemDetonationVfx(GameItemType gameItemBaseType, Vector2 position)
+    private void AddGameItemDetonationVfx(GameItemType gameItemBaseType, Vector2 position)
     {
         VfxType vfxType = gameItemBaseType switch
         {
@@ -126,6 +191,18 @@ public class VfxController : MonoBehaviour
             return pool;
         
         return null;
+    }
+    
+    private FlyingMessage GetMessageVfx()
+    {
+        FlyingMessage message = GetPool(VfxType.FlyingMessage).GetFreeElement() as FlyingMessage;
+
+        if (message != null)
+        {
+            message.Init(_gameFieldCenterPosition, Quaternion.identity);
+        }
+
+        return message;
     }
     
     private VfxBase GetVfx(VfxType type)

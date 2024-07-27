@@ -100,7 +100,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -512,6 +512,8 @@ MonoBehaviour:
   _lpcViewsContainerLayout: {fileID: 7208555441535584783}
   _lpcViewPrefab: {fileID: 6958226217548000247, guid: 9d88c14bb0f0fb340b3e652abb2da746, type: 3}
   __lpcViewsContainerPadding: 120
+  _timeAlarmAnimationDuration: 0.3
+  _timeAlarmAnimationScale: {x: 1.1, y: 1.1, z: 1}
 --- !u!114 &8722703999059934413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -824,7 +826,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0

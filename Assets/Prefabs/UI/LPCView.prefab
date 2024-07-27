@@ -162,6 +162,8 @@ MonoBehaviour:
     _sprite: {fileID: 21300000, guid: dbe6d27171f483f4fb1182599d960e97, type: 3}
   - _lpcType: 7
     _sprite: {fileID: 21300000, guid: 05eb13a3803511a47b829374f2ed871b, type: 3}
+  _updateAnimationDuration: 0.2
+  _updateAnimationScale: {x: 1.2, y: 1.2, z: 1}
 --- !u!1 &7728226025364998696
 GameObject:
   m_ObjectHideFlags: 0

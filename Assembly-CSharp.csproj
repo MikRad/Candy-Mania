@@ -51,9 +51,8 @@
      <Compile Include="Assets\Scripts\LevelEditor\LevelData.cs" />
      <Compile Include="Assets\JMO Assets\Cartoon FX\Scripts\CFX_LightIntensityFade.cs" />
      <Compile Include="Assets\Scripts\UI\SettingsPanel.cs" />
-     <Compile Include="Assets\Scripts\Vfx\ScalerVfx.cs" />
      <Compile Include="Assets\Scripts\UI\MainMenuButtons.cs" />
-     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
+     <Compile Include="Assets\Scripts\Events\Services\EventHandler.cs" />
      <Compile Include="Assets\Scripts\Audio\AudioSettings.cs" />
      <Compile Include="Assets\Scripts\Vfx\GamefieldShakerVfx.cs" />
      <Compile Include="Assets\Scripts\Vfx\FlyingMessage.cs" />
@@ -67,6 +66,7 @@
      <Compile Include="Assets\Scripts\UI\LevelInfoPanel.cs" />
      <Compile Include="Assets\Scripts\SingletonMonobehaviour.cs" />
      <Compile Include="Assets\Scripts\Events\GameItemSwapCompletedEvent.cs" />
+     <Compile Include="Assets\Scripts\Events\ComboCollectedEvent.cs" />
      <Compile Include="Assets\Scripts\Audio\SfxType.cs" />
      <Compile Include="Assets\Scripts\UI\LevelButton.cs" />
      <Compile Include="Assets\Scripts\Vfx\FlyingStarVfx.cs" />
@@ -114,7 +114,7 @@
      <Compile Include="Assets\Scripts\GameItemType.cs" />
      <Compile Include="Assets\JMO Assets\Cartoon FX\Scripts\CFX_LightFlicker.cs" />
      <Compile Include="Assets\JMO Assets\Cartoon FX\Scripts\CFX_AutoDestructShuriken.cs" />
-     <Compile Include="Assets\Scripts\Events\EventBinding.cs" />
+     <Compile Include="Assets\Scripts\Events\Services\EventBinding.cs" />
      <Compile Include="Assets\Scripts\Utils\Pool.cs" />
      <Compile Include="Assets\Scripts\GameItemAnimator.cs" />
      <Compile Include="Assets\Scripts\Events\Services\EventBus.cs" />
@@ -126,6 +126,7 @@
      <Compile Include="Assets\Scripts\Audio\Services\AudioController.cs" />
      <Compile Include="Assets\Scripts\Services\CameraHolder.cs" />
      <Compile Include="Assets\Scripts\Events\PossibleMovesChangedEvent.cs" />
+     <Compile Include="Assets\Scripts\Events\GameItemDetonationStartedEvent.cs" />
      <Folder Include="Assets" />
      <Folder Include="Assets\Scripts\Vfx" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

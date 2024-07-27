@@ -93,25 +93,21 @@ public class GameItem : MonoBehaviour
 
     private void AddDetonationFx()
     {
-        Vector3 position = CachedTransform.position;
+        EventBus.Get.RaiseEvent(this, new GameItemDetonationStartedEvent(this));
         
         if (this.IsUsual())
         {
             AudioController.Instance.PlaySfx(SfxType.ItemDetonation);
-            VfxController.Instance.AddGameItemDetonationVfx(BaseItemType, position);
         }
         else
         {
             if(this.IsStar())
             {
                 AudioController.Instance.PlaySfx(SfxType.StarDetonation);
-                VfxController.Instance.AddStarCollectVfx(position);
-                VfxController.Instance.AddFlyingStarVfx(position);
             }
             else
             {
                 AudioController.Instance.PlaySfx(SfxType.BombDetonation);
-                VfxController.Instance.AddBombDetonationVfx(position);
             }
         }
     }

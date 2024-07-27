@@ -89,10 +89,6 @@ MonoBehaviour:
   - {fileID: 5652212048595892637, guid: a87ff35e0a7edac4d9ce3228dc128f9d, type: 3}
   - {fileID: 5652212048595892637, guid: 711a26458d723304d939ac5731e9dd25, type: 3}
   - {fileID: 825665458414713663, guid: 10a7f7078bffc4c47bbfe039ce520dcb, type: 3}
-  - {fileID: 5195560713962962122, guid: 89bbe4385bfe0c044854433ef16106a9, type: 3}
-  - {fileID: 5195560713962962122, guid: 7c7bd75dffe5b4f46b06a945a9d8452c, type: 3}
   - {fileID: -9032950027343805913, guid: 3156817f64ec68948ad6bb26569b9ef5, type: 3}
-  _fallenItemVfxPrefab: {fileID: 1196411535255946808, guid: b7b06e45a8fcaf547b983603733ea73e, type: 3}
   _defaultVfxPoolSize: 10
   _itemDetonationVfxPoolSize: 20
-  _fallenItemsPoolSize: 100
